@@ -47,13 +47,15 @@ export default function MainGame() {
   if (game.deck.deck.length > 0) {
     return (
       <main className="flex flex-col gap-8 w-full h-screen items-center justify-center">
-        <div className="opponent-cards grid grid-cols-2 grid-rows-2 gap-2">
+        <div className="relative opponent-cards grid grid-cols-2 grid-rows-2 gap-2">
+          <p className="text-lg font-bold absolute -left-64 text-black">Opponent cards:</p>
           { game.deck.opponent.map((card, index) => (
             new Card(card[0], card[1], game, nw, cw).render("opponent-card", index)
           ))}
 
         </div>
         <div className="card-deck relative h-36 w-48 flex flex-row gap-2 justify-center gap-2">
+          <p className="text-lg font-bold absolute -left-64 text-black">Deck and discard pile:</p>
           {
             new Card(game.deck.deck[game.deck.deck.length - 1][0], game.deck.deck[game.deck.deck.length - 1][1], game, nw, cw).render("deck-card")
           }
@@ -68,7 +70,8 @@ export default function MainGame() {
             ) : null
           }
         </div>
-        <div className="player-cards grid grid-cols-2 grid-rows-2 gap-2">
+        <div className="relative player-cards grid grid-cols-2 grid-rows-2 gap-2">
+          <p className="text-lg font-bold absolute -left-64 text-black">Your cards:</p>
           { game.deck.user.map((card, index) => (
             new Card(card[0], card[1], game, nw, cw).render("player-card", index)
           ))}

@@ -2,6 +2,12 @@ import { Game } from "@/components/flow";
 import { NotificationWindow } from "@/components/nw";
 import { CardWindow } from "@/components/cw";
 
+const suits: { [key: string]: string } = {
+    h: "Hearts",
+    d: "Diamonds",
+    c: "Clubs",
+    s: "Spades",
+}
 
 class Card {
     public suit: string;
@@ -79,7 +85,7 @@ class Card {
                 }
                 this.nw.post("Go look at your card and make sure not to forget it. You can only look at this once.")
                 event.currentTarget.classList.add("start-checked");
-                this.cw.show(`${this.rank}${this.suit.slice(0, 1)}`);
+                this.cw.show(`${this.rank} of ${suits[this.suit.slice(0, 1)]}`);
                 this.cw.timer(5);
                 this.game.setAction({
                     agent: this.game.action.agent,
