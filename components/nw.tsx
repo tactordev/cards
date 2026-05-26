@@ -21,7 +21,9 @@ class NotificationWindow {
     }
 
     post(message: string) {
-        this.setMessageList([...this.messageList, message]);
+        this.messageList.push(message);
+        this.setMessageList([...this.messageList]);
+        return;
     } 
 }
 

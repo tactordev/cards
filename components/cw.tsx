@@ -14,7 +14,10 @@ class CardWindow {
         this.card = card;
         this.setCard = setCard;
         this.time = time;
-        this.setTimer = setTimer;
+        this.setTimer = (newTime) => {
+            this.time = newTime;
+            setTimer(newTime);
+        };
         this.timerId = null;
         this.nw = nw;
 
@@ -30,7 +33,7 @@ class CardWindow {
             )}
             {
                 this.time ? (
-                <p className="text-xs text-gray-500 mt-2">This card will be hidden in {this.time} seconds.</p>
+                <p className="text-xs text-gray-500 mt-2">This card will be hidden in {this.time.toFixed(1)} seconds.</p>
                 ) : <p></p>
             }
             </div>
@@ -43,6 +46,10 @@ class CardWindow {
 
     hide() {
         this.setCard(null);
+        if (this.timerId) {
+            clearTimeout(this.timerId);
+            this.timerId = null;
+        }
     }
 
     timer(seconds: number) {
@@ -55,11 +62,31 @@ class CardWindow {
             this.hide();
             this.timerId = null;
         }, seconds * 1000); 
+        setInterval(() => {
+            if (this.time === null) return;
+            const newTime = this.time ? this.time - 0.1 : 0;
+            if (newTime <= 0) {
+                this.setTimer(null);
+                this.hide();
+                if (this.timerId) {
+                    clearTimeout(this.timerId);
+                    this.timerId = null;
+                }
+                return;
+            } else {
+                this.setTimer(newTime);
+            }
+        }, 100);
+        return;
     }
 
     presence() {
         if (this.card) return true;
         return false;
+    }
+
+    content() {
+        return this.card;
     }
 }
 

@@ -1,4 +1,3 @@
-import { Actions } from "@/components/flow";
 import { Game } from "@/components/flow";
 import { NotificationWindow } from "@/components/nw";
 import { CardWindow } from "@/components/cw";
@@ -30,7 +29,7 @@ class Deck {
     constructor(
         nw: NotificationWindow,
         cw: CardWindow,
-        game: Game
+        game: Game,
     ) {
         const { deck, user, opponent } = randomiseCards();
         this.deck = deck;
@@ -39,7 +38,7 @@ class Deck {
     }
 
     draw() {
-        
+        return this.deck.shift();
     }
 
     top() {
