@@ -17,7 +17,7 @@ export default function MainGame() {
   
   const [action, setAction] = useState<Action>({ agent: "both", type: "start", config: 2 }); // actionId, person, action, config
   const [opponentKnows, setOpponentKnows] = useState<{location: string, card: [string, string]}[]>([]);
-  const [messageList, setMessageList] = useState<string[]>(["Welcome to Tactor cards! It is the start of the game. Look at two of your cards."]);
+  const [messageList, setMessageList] = useState<string[][]>([["Welcome to Tactor cards! It is the start of the game. Look at two of your cards.", "info"]]);
   const nw = new NotificationWindow(messageList, setMessageList);
   const [card, setCard] = useState<string | null>(null);
   const [time, setTimer] = useState<number | null>(null);

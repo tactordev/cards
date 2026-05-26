@@ -27,7 +27,7 @@ class Card {
 
     handler(event: React.MouseEvent<HTMLDivElement>) {
         if (!this.game.isPlayerTurn()) {
-            this.nw.post("You cannot use this card when it's not your turn.")
+            this.nw.post("You cannot use this card when it's not your turn.", "warning");
         }
         
         const curAction = this.game.getActionType();
@@ -36,27 +36,27 @@ class Card {
             return;
         } else if (event.currentTarget.classList[0] === "deck-card") {
             if (curAction !== "pickup") {
-                this.nw.post("You cannot pick up a card when it is not your turn.")
+                this.nw.post("You cannot pick up a card when it is not your turn.", "warning");
                 return;
             }
             const newCard = this.game.deck.draw();
             if (!newCard) {
-                this.nw.post("The deck is empty. You cannot draw a card. Automatic deck reshuffling is not implemented yet."); // add automatic deck reshuffling later
+                this.nw.post("The deck is empty. You cannot draw a card. Automatic deck reshuffling is not implemented yet.", "warning"); // add automatic deck reshuffling later
                 this.nw.post("Your total: " + this.game.deck.user.map(card => card[0]).reduce((sum, rank) => {
                     if (rank === "A") return sum + 1;
                     else if (rank === "T" || rank === "J" || rank === "Q" || rank === "K") return sum + 10;
                     else return sum + parseInt(rank);
-                }, 0));
+                }, 0), "info");
                 this.nw.post("Opponent's total: " + this.game.deck.opponent.map(card => card[0]).reduce((sum, rank) => {
                     if (rank === "A") return sum + 1;
                     else if (rank === "T" || rank === "J" || rank === "Q" || rank === "K") return sum + 10;
                     else return sum + parseInt(rank);
-                }, 0));
+                }, 0), "info");
                 return;
             }
 
             this.cw.show(newCard);
-            this.nw.post("You picked up a new card. View it in the card viewer. Select a card to discard.");
+            this.nw.post("You picked up a new card. View it in the card viewer. Select a card to discard.", "info");
             this.game.triggerNextAction();
         } else if (event.currentTarget.classList[0] === "player-card") {
             if (curAction === "discard") {
@@ -71,7 +71,7 @@ class Card {
                     this.game.deck.user.splice(cardPos, 0, `${newCard[0]}${newCard[1]}`);
                     this.cw.hide();
                 }
-                this.nw.post(`You discarded ${cardToDiscard}.`);
+                this.nw.post(`You discarded ${cardToDiscard}.`, "info");
                 this.game.triggerNextAction();
             } else if (curAction === "jack") {
                 // jack logic
@@ -80,10 +80,10 @@ class Card {
                     this.cw.hide();
                 }
                 if (event.currentTarget.classList.contains("start-checked")) {
-                    this.nw.post("You have already checked this card. Check a different card.")
+                    this.nw.post("You have already checked this card. Check a different card.", "warning");
                     return;
                 }
-                this.nw.post("Go look at your card and make sure not to forget it. You can only look at this once.")
+                this.nw.post("Go look at your card and make sure not to forget it. You can only look at this once.", "info");
                 event.currentTarget.classList.add("start-checked");
                 this.cw.show(`${this.rank} of ${suits[this.suit.slice(0, 1)]}`);
                 this.cw.timer(5);
@@ -97,13 +97,13 @@ class Card {
                 }
                 return;
             } else {
-                this.nw.post("You can only check your own cards at the start of the game or when playing Jack.");
+                this.nw.post("You can only check your own cards at the start of the game or when playing Jack.", "warning");
             }
         } else { // opponent cards
             if (curAction === "queen") {
                 // queen logic
             } else {
-                this.nw.post("You can only check opponent cards when playing Queen.");
+                this.nw.post("You can only check opponent cards when playing Queen.", "warning");
             }
         }
         

@@ -56,17 +56,17 @@ class Game {
         // pickup
         const newCard = this.deck.draw();
         if (!newCard) {
-            this.nw.post("The deck is empty. Opponent cannot draw a card. Automatic deck reshuffling is not implemented yet.");
+            this.nw.post("The deck is empty. Opponent cannot draw a card. Automatic deck reshuffling is not implemented yet.", "warning");
             this.nw.post("Your total: " + this.deck.user.map(card => card[0]).reduce((sum, rank) => {
                 if (rank === "A") return sum + 1;
                 else if (rank === "T" || rank === "J" || rank === "Q" || rank === "K") return sum + 10;
                 else return sum + parseInt(rank);
-            }, 0));
+            }, 0), "info");
             this.nw.post("Opponent's total: " + this.deck.opponent.map(card => card[0]).reduce((sum, rank) => {
                 if (rank === "A") return sum + 1;
                 else if (rank === "T" || rank === "J" || rank === "Q" || rank === "K") return sum + 10;
                 else return sum + parseInt(rank);
-            }, 0));
+            }, 0), "info");
             return;
         }
 
@@ -96,21 +96,21 @@ class Game {
                 type: "pickup",
                 config: 1,
             });
-            this.nw.post("It is now your turn. Pick up a card from the deck.");
+            this.nw.post("It is now your turn. Pick up a card from the deck.", "info");
         } else if (this.action.type === "pickup") {
             this.setAction({
                 agent: this.action.agent,
                 type: "discard",
                 config: 1,
             });
-            this.nw.post("Discard a card from your hand.");
+            this.nw.post("Discard a card from your hand.", "info");
         } else if (this.action.type === "discard") {
             this.setAction({
                 agent: this.action.agent === "player" ? "opponent" : "player",
                 type: "pickup",
                 config: 1,
             });
-            this.nw.post(`It is now ${this.isPlayerTurn() ? "your" : "opponent's"} turn. ${this.isPlayerTurn() ? "Pick up a card from the deck." : "Opponent is picking up a card..."}`);
+            this.nw.post(`It is now ${this.isPlayerTurn() ? "your" : "opponent's"} turn. ${this.isPlayerTurn() ? "Pick up a card from the deck." : "Opponent is picking up a card..."}`, "info");
             if (this.isOpponentTurn()) {
                 setTimeout(() => {
                     this.simulateOpponentTurn();
