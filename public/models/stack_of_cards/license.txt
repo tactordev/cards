@@ -1,0 +1,11 @@
+Model Information:
+* title:	Stack of cards
+* source:	https://sketchfab.com/3d-models/stack-of-cards-1446fd7256f04c1380e28cfb6c2cf68c
+* author:	Peterko64 (https://sketchfab.com/Peterko64)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Stack of cards" (https://sketchfab.com/3d-models/stack-of-cards-1446fd7256f04c1380e28cfb6c2cf68c) by Peterko64 (https://sketchfab.com/Peterko64) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

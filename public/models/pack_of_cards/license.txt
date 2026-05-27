@@ -1,0 +1,11 @@
+Model Information:
+* title:	Pack of Cards
+* source:	https://sketchfab.com/3d-models/pack-of-cards-c77e31d423df457aa3ae34177dbe7f4a
+* author:	BeechAssets (https://sketchfab.com/BeechAssets)
+
+Model License:
+* license type:	CC-BY-NC-SA-4.0 (http://creativecommons.org/licenses/by-nc-sa/4.0/)
+* requirements:	Author must be credited. No commercial use. Modified versions must have the same license.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Pack of Cards" (https://sketchfab.com/3d-models/pack-of-cards-c77e31d423df457aa3ae34177dbe7f4a) by BeechAssets (https://sketchfab.com/BeechAssets) licensed under CC-BY-NC-SA-4.0 (http://creativecommons.org/licenses/by-nc-sa/4.0/)

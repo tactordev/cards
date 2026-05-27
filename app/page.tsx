@@ -1,20 +1,33 @@
 "use client";
-import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, createContext  } from "react";
 import { Action } from "@/components/flow";
 import { Game } from "@/components/flow";
 import { NotificationWindow } from "@/components/nw";
 import { CardWindow } from "@/components/cw";
 import { Card, FaceUpCard } from "@/components/card";
+import TwoD from "@/components/2d";
+import ThreeD from "@/components/3d";
 // <img src="https://i.ibb.co/xKdhCXTY/card-mockup.png" alt="card mockup" border="0">
 
 
+function GameTypeSelector({ type, setType }: { type: 2 | 3, setType: (type: 2 | 3) => void }) {
+  return (
+    <div className="fixed top-4 left-4 z-10">
+      <label htmlFor="game-type" className="mr-2 font-bold">Select game type:</label>
+      <select id="game-type" value={type} onChange={(e) => setType(parseInt(e.target.value) as 2 | 3)} className="p-2 border rounded-md">
+        <option value={2}>2D</option>
+        <option value={3}>3D</option>
+      </select>
+    </div>
+  )
+}
 
-
-
+const GameContext = createContext<Game | null>(null);
+export { GameContext };
 
 export default function MainGame() {
-  
+  const [gameType, setGameType] = useState<2 | 3>(3);
+
   const [action, setAction] = useState<Action>({ agent: "both", type: "start", config: 2 }); // actionId, person, action, config
   const [opponentKnows, setOpponentKnows] = useState<{location: string, card: [string, string]}[]>([]);
   const [messageList, setMessageList] = useState<string[][]>([["Welcome to Tactor cards! It is the start of the game. Look at two of your cards.", "info"]]);
@@ -44,50 +57,26 @@ export default function MainGame() {
       </div>
     )
   }
-  if (game.deck.deck.length > 0) {
-    return (
-      <main className="flex flex-col gap-8 w-full h-screen items-center justify-center">
-        <div className="relative opponent-cards grid grid-cols-2 grid-rows-2 gap-2">
-          <p className="text-lg font-bold absolute -left-64 text-black">Opponent cards:</p>
-          { game.deck.opponent.map((card, index) => (
-            new Card(card[0], card[1], game, nw, cw).render("opponent-card", index)
-          ))}
 
-        </div>
-        <div className="card-deck relative h-36 w-48 flex flex-row gap-2 justify-center gap-2">
-          <p className="text-lg font-bold absolute -left-64 text-black">Deck and discard pile:</p>
-          {
-            new Card(game.deck.deck[game.deck.deck.length - 1][0], game.deck.deck[game.deck.deck.length - 1][1], game, nw, cw).render("deck-card")
-          }
-          <p className="absolute bottom-4 text-xs text-white left-3">{game.deck.deck.length} cards left</p>
-          { 
-            discarded.length > 0 ? (
-              <div>
-                {[discarded[discarded.length - 1].render("discarded-card", -2)]}
-                <p className="absolute bottom-8 text-xs text-white right-1/4">{discarded[discarded.length -1].rank}{discarded[discarded.length -1].suit.slice(0, 1)}</p>
-                <p className="absolute bottom-4 text-xs text-white right-3.5">Discard pile</p>
-              </div>
-            ) : null
-          }
-        </div>
-        <div className="relative player-cards grid grid-cols-2 grid-rows-2 gap-2">
-          <p className="text-lg font-bold absolute -left-64 text-black">Your cards:</p>
-          { game.deck.user.map((card, index) => (
-            new Card(card[0], card[1], game, nw, cw).render("player-card", index)
-          ))}
-        </div>
-        { nw.render() }
-        { cw.render() }
-        <p className="fixed bottom-4 right-4 bg-gray-200 p-2 rounded-md">{JSON.stringify(game.action)}</p>
-      </main>
-    );
-  } else {
-    return (
-      <main className="flex flex-col gap-8 w-full h-screen items-center justify-center">
+  const content = game.deck.deck.length > 0
+    ? gameType === 2
+      ? <TwoD />
+      : <ThreeD />
+    : (
+      <div className="flex flex-col gap-8 w-full h-screen items-center justify-center">
         <h1 className="text-2xl text-center">The deck is empty.<br />Game over.</h1>
         { finalScores() }
         <a href="/" className="text-blue-500 hover:underline">Play again</a>
-      </main>
+      </div>
     );
-  }
+
+
+  return (
+    <main>
+      <GameTypeSelector type={gameType} setType={setGameType} />
+      <GameContext.Provider value={game}>
+        {content}
+      </GameContext.Provider>
+    </main>
+  )
 }
