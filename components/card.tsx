@@ -1,6 +1,8 @@
 import { Game } from "@/components/flow";
 import { NotificationWindow } from "@/components/nw";
 import { CardWindow } from "@/components/cw";
+import { useContext } from "react";
+import { GameContext } from "@/app/page";
 
 const suits: { [key: string]: string } = {
     h: "Hearts",
@@ -12,7 +14,7 @@ const suits: { [key: string]: string } = {
 class Card {
     public suit: string;
     public rank: string;
-    private game: Game; 
+    public game: Game; 
     private nw: NotificationWindow;
     private cw: CardWindow;
     
@@ -39,6 +41,10 @@ class Card {
                 this.nw.post("You cannot pick up a card when it is not your turn.", "warning");
                 return;
             }
+            if (this.cw.presence()) {
+                this.nw.post("You are already viewing a card. Please discard this card or wait for the timer to elapse before selecting a new one.", "warning");
+                return;
+            }
             const newCard = this.game.deck.draw();
             if (!newCard) {
                 this.nw.post("The deck is empty. You cannot draw a card. Automatic deck reshuffling is not implemented yet.", "warning"); // add automatic deck reshuffling later
@@ -55,37 +61,40 @@ class Card {
                 return;
             }
 
-            this.cw.show(newCard);
+            const res = this.cw.show(new FaceUpCard(newCard[0], newCard[1], this.game, this.nw, this.cw));
             this.nw.post("You picked up a new card. View it in the card viewer. Select a card to discard.", "info");
             this.game.triggerNextAction();
         } else if (event.currentTarget.classList[0] === "player-card") {
             if (curAction === "discard") {
-                const cardToDiscard = `${this.rank}${this.suit.slice(0, 1)}`;
-                const newDiscarded = [...this.game.discarded, new FaceUpCard(this.suit, this.rank, this.game, this.nw, this.cw)];
+                console.log(this.rank, this.suit);
+                const cardToDiscard = `${this.rank}${this.suit}`;
+                const newDiscarded = [...this.game.discarded, new FaceUpCard(this.rank, this.suit, this.game, this.nw, this.cw)];
                 this.game.setDiscarded(newDiscarded);
                 const cardPos = this.game.deck.user.indexOf(cardToDiscard);
                 const newUserCards = this.game.deck.user.filter(card => card !== cardToDiscard);
                 this.game.deck.user = newUserCards;
                 const newCard = this.cw.content();
                 if (newCard) {
-                    this.game.deck.user.splice(cardPos, 0, `${newCard[0]}${newCard[1]}`);
+                    this.game.deck.user.splice(cardPos, 0, `${newCard.rank}${newCard.suit}`);
                     this.cw.hide();
                 }
-                this.nw.post(`You discarded ${cardToDiscard}.`, "info");
+                this.nw.post(`You discarded a ${this.rank} of ${suits[this.suit].toLowerCase()}.`, "info");
                 this.game.triggerNextAction();
             } else if (curAction === "jack") {
                 // jack logic
             } else if (curAction === "start") {
-                if (this.cw.presence()) {
-                    this.cw.hide();
-                }
                 if (event.currentTarget.classList.contains("start-checked")) {
                     this.nw.post("You have already checked this card. Check a different card.", "warning");
                     return;
                 }
+                if (this.cw.presence()) {
+                    this.nw.post("You are already viewing a card. Please discard this card or wait for the timer to elapse before selecting a new one.", "warning");
+                    return;
+                }
                 this.nw.post("Go look at your card and make sure not to forget it. You can only look at this once.", "info");
                 event.currentTarget.classList.add("start-checked");
-                this.cw.show(`${this.rank} of ${suits[this.suit.slice(0, 1)]}`);
+                const res = this.cw.show(new FaceUpCard(this.rank, this.suit, this.game, this.nw, this.cw));
+                console.log("")
                 this.cw.timer(5);
                 this.game.setAction({
                     agent: this.game.action.agent,
@@ -124,10 +133,18 @@ class Card {
 class FaceUpCard extends Card {
     
 
-    constructor(suit: string, rank: string, game: Game, nw: NotificationWindow, cw: CardWindow) {
-        super(suit, rank, game, nw, cw);
+    constructor(rank: string, suit: string, game: Game, nw: NotificationWindow, cw: CardWindow) {
+        super(rank, suit, game, nw, cw);
     }
 
+
+    render(type: string, index?: number) {
+        return (
+            <div className={`${type} face-up-card`} onClick={(event) => this.handler(event)} key={index}>
+                <img src={`/models/cards/${this.rank}_of_${suits[this.suit].toLowerCase()}.png`} alt="card mockup" className="h-36 w-24 shadow-sm opacity-80 mb-2" />
+            </div>
+        )
+    }
 
 }
 

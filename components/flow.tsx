@@ -73,7 +73,7 @@ class Game {
         // discarding
         const randomNum = Math.floor(Math.random() * 4);
         const cardToDiscard = this.deck.opponent[randomNum];
-        const newDiscarded = [...this.discarded, new FaceUpCard(cardToDiscard[1], cardToDiscard[0], this, this.nw, this.cw)];
+        const newDiscarded = [...this.discarded, new FaceUpCard(cardToDiscard[0], cardToDiscard[1], this, this.nw, this.cw)];
         this.setDiscarded(newDiscarded);
         const cardPos = this.deck.opponent.indexOf(cardToDiscard);
         this.deck.opponent.splice(cardPos, 1, newCard);

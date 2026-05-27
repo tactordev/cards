@@ -33,8 +33,6 @@ export default function TwoD() {
               discarded.length > 0 ? (
                 <div>
                   {[discarded[discarded.length - 1].render("discarded-card", -2)]}
-                  <p className="absolute bottom-8 text-xs text-white right-1/4">{discarded[discarded.length -1].rank}{discarded[discarded.length -1].suit.slice(0, 1)}</p>
-                  <p className="absolute bottom-4 text-xs text-white right-3.5">Discard pile</p>
                 </div>
               ) : null
             }

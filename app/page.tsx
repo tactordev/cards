@@ -46,7 +46,7 @@ export default function MainGame() {
   const [opponentKnows, setOpponentKnows] = useState<{location: string, card: [string, string]}[]>([]);
   const [messageList, setMessageList] = useState<string[][]>([["Welcome to Tactor cards! It is the start of the game. Look at two of your cards.", "info"]]);
   const nw = new NotificationWindow(messageList, setMessageList);
-  const [card, setCard] = useState<string | null>(null);
+  const [card, setCard] = useState<FaceUpCard | null>(null);
   const [time, setTimer] = useState<number | null>(null);
   const cw = new CardWindow(nw, card, setCard, time, setTimer);
   const [discarded, setDiscarded] = useState<FaceUpCard[]>([]);

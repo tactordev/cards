@@ -4,24 +4,31 @@ import { NotificationWindow } from "@/components/nw";
 import {
     CircleSlash
 } from "lucide-react";
+import { Card, FaceUpCard } from "./card";
+import { GameContext } from "@/app/page";
 
 class CardWindow {
-    private card: string | null;
-    private setCard: (card: string | null) => void;
+    private card: FaceUpCard | null;
+    private setCard: (card: FaceUpCard | null) => void;
     private time: number | null
     private setTimer: (timer: number | null) => void;
     private timerId: ReturnType<typeof setTimeout> | null;
+    private intervalId: ReturnType<typeof setInterval> | null;
     private nw: NotificationWindow;
 
-    constructor(nw: NotificationWindow, card: string | null, setCard: (card: string | null) => void, time: number | null, setTimer: (timer: number | null) => void) {
+    constructor(nw: NotificationWindow, card: FaceUpCard | null, setCard: (card: FaceUpCard | null) => void, time: number | null, setTimer: (timer: number | null) => void) {
         this.card = card;
-        this.setCard = setCard;
+        this.setCard = ((card: FaceUpCard | null) => {
+            this.card = card;
+            setCard(card);
+        });
         this.time = time;
         this.setTimer = (newTime) => {
             this.time = newTime;
             setTimer(newTime);
         };
         this.timerId = null;
+        this.intervalId = null;
         this.nw = nw;
 
     }
@@ -32,7 +39,9 @@ class CardWindow {
                 <div className="relative flex flex-col w-full h-full items-center justify-center">
                     <p className="absolute left-4 top-0 small-caps text-lg font-semibold text-gray-700">View Cards</p>
                     {this.card ? (
-                        <p>{this.card}</p>
+                        <GameContext.Provider value={this.card.game}>
+                            { new FaceUpCard(this.card.rank, this.card.suit, this.card.game, this.nw, this).render("card-window") }
+                        </GameContext.Provider>
                     ) : (
                         <div className="flex flex-col items-center justify-center">
                             <CircleSlash className="w-16 h-16 text-gray-400" />
@@ -49,8 +58,13 @@ class CardWindow {
         )
     }
 
-    show(card: string) {
+    show(card: FaceUpCard) {
+        if (this.card) {
+            this.nw.post("You are already viewing a card. Please discard this card or wait for the timer to elapse before selecting a new one.", "warning");
+            return false;
+        }
         this.setCard(card);
+        return true;
     }
 
     hide() {
@@ -59,11 +73,18 @@ class CardWindow {
             clearTimeout(this.timerId);
             this.timerId = null;
         }
+        if (this.intervalId) {
+            clearInterval(this.intervalId);
+            this.intervalId = null;
+        }
     }
 
     timer(seconds: number) {
         if (this.timerId) {
             clearTimeout(this.timerId);
+        }
+        if (this.intervalId) {
+            clearInterval(this.intervalId);
         }
         this.setTimer(seconds);
         this.timerId = setTimeout(() => {
@@ -71,21 +92,18 @@ class CardWindow {
             this.hide();
             this.timerId = null;
         }, seconds * 1000); 
-        setInterval(() => {
+        this.intervalId = setInterval(() => {
             if (this.time === null) return;
             const newTime = this.time ? this.time - 0.1 : 0;
             if (newTime <= 0) {
                 this.setTimer(null);
                 this.hide();
-                if (this.timerId) {
-                    clearTimeout(this.timerId);
-                    this.timerId = null;
-                }
                 return;
             } else {
                 this.setTimer(newTime);
             }
         }, 100);
+        
         return;
     }
 
