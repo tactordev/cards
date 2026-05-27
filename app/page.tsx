@@ -7,17 +7,30 @@ import { CardWindow } from "@/components/cw";
 import { Card, FaceUpCard } from "@/components/card";
 import TwoD from "@/components/2d";
 import ThreeD from "@/components/3d";
+import {
+  Info
+} from "lucide-react";
 // <img src="https://i.ibb.co/xKdhCXTY/card-mockup.png" alt="card mockup" border="0">
 
 
 function GameTypeSelector({ type, setType }: { type: 2 | 3, setType: (type: 2 | 3) => void }) {
   return (
-    <div className="absolute top-4 left-4 z-10 flex flex-row bg-gray-200 p-2 rounded-md gap-2">
-      <div className={`flex flex-row px-2 py-1 rounded-md hover:cursor-pointer transition-colors duration-200 hover:bg-gray-300 ${type === 2 ? "bg-gray-400" : ""}`} onClick={() => setType(2)}>
+    <div className="absolute section top-4 left-4 z-10 flex flex-row bg-gray-200 p-2 rounded-md gap-2 shadow-sm items-center justify-center w-24 h-12">
+      <div className={`flex flex-row px-2 py-1 rounded-md hover:cursor-pointer transition-colors duration-200 hover:bg-gray-300 ${type === 2 ? "bg-slate-400/40" : ""}`} onClick={() => setType(2)}>
         <p>2D</p>
       </div>
-      <div className={`flex flex-row px-2 py-1 rounded-md hover:cursor-pointer transition-colors duration-200 hover:bg-gray-300 ${type === 3 ? "bg-gray-400" : ""}`} onClick={() => setType(3)}  >
+      <div className={`flex flex-row px-2 py-1 rounded-md hover:cursor-pointer transition-colors duration-200 hover:bg-gray-300 ${type === 3 ? "bg-slate-400/40" : ""}`} onClick={() => setType(3)}  >
         <p>3D</p>
+      </div>
+    </div>
+  )
+}
+
+function Helps() {
+  return (
+    <div className="absolute top-166 left-4 flex flex-row">
+      <div className="section px-3 group py-2 shadow-sm rounded-md hover:cursor-pointer hover:-translate-y-0.5 transition-transform duration-200">
+        <Info className="w-6 h-6 text-gray-500 inline-block group-hover:text-blue-500 transition-colors duration-200" />
       </div>
     </div>
   )
@@ -73,8 +86,9 @@ export default function MainGame() {
 
 
   return (
-    <main>
+    <main className="relative w-screen h-screen flex flex-col items-start justify-start">
       <GameTypeSelector type={gameType} setType={setGameType} />
+      <Helps />
       <GameContext.Provider value={game}>
         {content}
       </GameContext.Provider>

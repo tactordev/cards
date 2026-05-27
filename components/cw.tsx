@@ -1,6 +1,9 @@
 "use client";
 import { useState } from "react";
 import { NotificationWindow } from "@/components/nw";
+import {
+    CircleSlash
+} from "lucide-react";
 
 class CardWindow {
     private card: string | null;
@@ -25,17 +28,23 @@ class CardWindow {
 
     render() {
         return (
-            <div className="fixed right-24 shadow-lg w-72 h-72 rounded-md shadow-md flex flex-col bg-gray-200 items-center pt-4">
-            {this.card ? (
-                <p>{this.card}</p>
-            ) : (
-                <p>No card selected.</p>
-            )}
-            {
-                this.time ? (
-                <p className="text-xs text-gray-500 mt-2">This card will be hidden in {this.time.toFixed(1)} seconds.</p>
-                ) : <p></p>
-            }
+            <div className="absolute section shadow-sm left-4 w-72 h-72 top-18 rounded-md shadow-md flex flex-col bg-gray-200 items-center pt-4">
+                <div className="relative flex flex-col w-full h-full items-center justify-center">
+                    <p className="absolute left-4 top-0 small-caps text-lg font-semibold text-gray-700">View Cards</p>
+                    {this.card ? (
+                        <p>{this.card}</p>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center">
+                            <CircleSlash className="w-16 h-16 text-gray-400" />
+                            <p className="text-gray-500 mt-2">No card selected.</p>
+                        </div>
+                    )}
+                    {
+                        this.time ? (
+                        <p className="text-xs text-gray-500 mt-2">This card will be hidden in {this.time.toFixed(1)} seconds.</p>
+                        ) : <p></p>
+                    }
+                </div>
             </div>
         )
     }
