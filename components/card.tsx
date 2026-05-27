@@ -133,7 +133,7 @@ class Card {
 
     render(type: string, index?: number) {
         return (
-            <div className={`${type}`} onClick={(event) => this.handler(event)} key={index}>
+            <div className={`${type} hover:cursor-pointer hover:border-3 hover:border-yellow-500 border-inset`} onClick={(event) => this.handler(event)} key={index}>
                 <img src="https://i.ibb.co/xKdhCXTY/card-mockup.png" alt="card mockup" className="h-36 w-24" />
             </div>
         )

@@ -28,7 +28,7 @@ function GameTypeSelector({ type, setType }: { type: 2 | 3, setType: (type: 2 | 
 
 function Helps() {
   return (
-    <div className="absolute top-166 left-4 flex flex-row">
+    <div className="absolute top-178 left-4 flex flex-row">
       <div className="section px-3 group py-2 shadow-sm rounded-md hover:cursor-pointer hover:-translate-y-0.5 transition-transform duration-200">
         <Info className="w-6 h-6 text-gray-500 inline-block group-hover:text-blue-500 transition-colors duration-200" />
       </div>

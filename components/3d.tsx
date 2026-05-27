@@ -3,7 +3,6 @@ import React, { useRef, Suspense } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useGLTF, PresentationControls, OrbitControls, Center, Resize } from "@react-three/drei";
 import * as three from "three";
-import { CameraControls } from "three-stdlib";
 
 // always:
 // scene, camera, renderer
@@ -118,8 +117,8 @@ export default function TwoD() {
           <PackOfCards />
           <CardStack />
         </Suspense>
-{/* 
-        <OrbitControls /> */}
+
+        <OrbitControls />
         <Floor />
         <BackWall />
 
