@@ -66,7 +66,6 @@ class Card {
             this.game.triggerNextAction();
         } else if (event.currentTarget.classList[0] === "player-card") {
             if (curAction === "discard") {
-                console.log(this.rank, this.suit);
                 const cardToDiscard = `${this.rank}${this.suit}`;
                 const newDiscarded = [...this.game.discarded, new FaceUpCard(this.rank, this.suit, this.game, this.nw, this.cw)];
                 this.game.setDiscarded(newDiscarded);
@@ -107,6 +106,18 @@ class Card {
                 return;
             } else {
                 this.nw.post("You can only check your own cards at the start of the game or when playing Jack.", "warning");
+            }
+        } else if (event.currentTarget.classList[0] === "card-window") {
+            if (!this.cw.content()) {
+                return;
+            }
+            if (curAction === "discard") {
+                const cardToDiscard = `${this.cw.content()!.rank}${this.cw.content()!.suit}`;
+                const newDiscarded = [...this.game.discarded, new FaceUpCard(this.rank, this.suit, this.game, this.nw, this.cw)];
+                this.game.setDiscarded(newDiscarded);
+                this.cw.hide();
+                this.nw.post(`You discarded a ${this.rank} of ${suits[this.suit].toLowerCase()}.`, "info");
+                this.game.triggerNextAction();
             }
         } else { // opponent cards
             if (curAction === "queen") {
