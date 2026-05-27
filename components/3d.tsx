@@ -94,7 +94,7 @@ function PackOfCards() {
 function CardStack() {
     const { scene } = useGLTF("/models/stack_of_cards/scene.gltf");
     return (
-        <group className="hover:cursor-pointer" scale={1} position={[-1.5, -1.65, 21.25]} rotation={[0, 0, 0]} onClick={() => console.log("clicked card stack")}>
+        <group scale={1} position={[-1.5, -1.65, 21.25]} rotation={[0, 0, 0]} onClick={() => console.log("clicked card stack")}>
             <Center>
                 <Resize>
                     <primitive object={scene} />

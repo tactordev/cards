@@ -12,12 +12,13 @@ import ThreeD from "@/components/3d";
 
 function GameTypeSelector({ type, setType }: { type: 2 | 3, setType: (type: 2 | 3) => void }) {
   return (
-    <div className="fixed top-4 left-4 z-10">
-      <label htmlFor="game-type" className="mr-2 font-bold">Select game type:</label>
-      <select id="game-type" value={type} onChange={(e) => setType(parseInt(e.target.value) as 2 | 3)} className="p-2 border rounded-md">
-        <option value={2}>2D</option>
-        <option value={3}>3D</option>
-      </select>
+    <div className="absolute top-4 left-4 z-10 flex flex-row bg-gray-200 p-2 rounded-md gap-2">
+      <div className={`flex flex-row px-2 py-1 rounded-md hover:cursor-pointer transition-colors duration-200 hover:bg-gray-300 ${type === 2 ? "bg-gray-400" : ""}`} onClick={() => setType(2)}>
+        <p>2D</p>
+      </div>
+      <div className={`flex flex-row px-2 py-1 rounded-md hover:cursor-pointer transition-colors duration-200 hover:bg-gray-300 ${type === 3 ? "bg-gray-400" : ""}`} onClick={() => setType(3)}  >
+        <p>3D</p>
+      </div>
     </div>
   )
 }
