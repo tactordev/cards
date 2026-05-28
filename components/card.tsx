@@ -16,6 +16,7 @@ class Card {
     public rank: string;
     public game: Game; 
     public viewing: boolean = false;
+    public snapSelected: boolean = false;
     private nw: NotificationWindow;
     private cw: CardWindow;
     
@@ -29,6 +30,7 @@ class Card {
         this.game = game;
         this.nw = nw;
         this.cw = cw;
+        this.snapSelected = false;
     }
 
     handler(event: React.MouseEvent<HTMLDivElement>) { // handles clicking of cards (in hand, deck and cw)
@@ -140,8 +142,11 @@ class Card {
                 }, 5000);
                 // #### //
 
-
-
+            } else if (curAction === "snap") {
+                this.snapSelected = true;
+                event.currentTarget.classList.add("border-green-500");
+                event.currentTarget.classList.remove("border-transparent");
+                this.nw.post("You have selected this card for snapping. If you wish to snap it, remember to click the SNAP button!", "info");
             } else { // notifies user of error
                 this.nw.post("You can only check your own cards at the start of the game or when playing Jack.", "warning");
             }
@@ -161,6 +166,7 @@ class Card {
                 this.game.setDiscarded(newDiscarded);
                 this.cw.hide();
                 this.nw.post(`You discarded a ${this.rank} of ${suits[this.suit].toLowerCase()}.`, "info");
+                this.game.userCards = this.game.userCards.filter(card => card.rank !== cardToDiscard[0] || card.suit !== cardToDiscard[1]);
                 this.game.triggerNextAction();
             }
 
@@ -186,6 +192,9 @@ class Card {
 
 
     render(type: string, index?: number) { // render card onto screen
+        if (type === "player-card") {
+            this.game.userCards.push(this);
+        }
         return (
             <div className={`${type} hover:cursor-pointer border-3 border-transparent hover:border-yellow-500 border-inset transition-colors duration-200 h-38 w-24 bg-gray-300 rounded-md flex items-center justify-center`} onClick={(event) => this.handler(event)} key={index}>
                 <img src="/models/cards/back.png" alt="card mockup" className={`h-36 w-24`} />

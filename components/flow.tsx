@@ -3,7 +3,7 @@ import { useState } from "react";
 import { NotificationWindow } from "@/components/nw";
 import { Deck } from "@/components/deck";
 import { CardWindow } from "@/components/cw";
-import { FaceUpCard } from "./card";
+import { Card, FaceUpCard } from "./card";
 
 type Action = {
     agent: "player" | "opponent" | "both";
@@ -28,6 +28,7 @@ class Game {
     public setDiscarded: (discarded: FaceUpCard[]) => void;
     public snapTimer: number;
     public setSnapTimer: (timer: number) => void;
+    public userCards: Card[];
     private snapTimeoutId: ReturnType<typeof setTimeout> | null;
     private snapIntervalId: ReturnType<typeof setInterval> | null;
 
@@ -53,6 +54,7 @@ class Game {
         };
         this.snapTimeoutId = null;
         this.snapIntervalId = null;
+        this.userCards = [];
     }
 
     isPlayerTurn() { // checks if it is the player's turn (obv)
@@ -164,10 +166,22 @@ class Game {
                     }
 
                     this.nw.post(`You can no longer snap.`, "info");
+                    
+                    for (const card of this.userCards) {
+                        card.snapSelected = false;
+                    }
+
+                    const cardEls = document.querySelectorAll(".border-green-500");
+                    cardEls.forEach(el => {
+                        el.classList.remove("border-green-500");
+                        el.classList.add("border-transparent");
+                    });
                     this.triggerNextAction();
                 }
             }, 1000);
         } else if (this.action.type === "snap") { // snap timer finished
+
+            // switch turns
             this.setAction({
                 agent: this.action.config.next,
                 type: "pickup",
@@ -178,7 +192,7 @@ class Game {
             });
             this.nw.post(`It is now your ${this.isPlayerTurn() ? "" : "opponent's"} turn. ${this.isPlayerTurn() ? "Pick up a card from the deck." : "Opponent is picking up a card..."}`, "info");
 
-            // simulates the opponent's turn
+            // simulates the opponent's turn (if it is their turn)
             if (this.action.agent === "opponent") {
                 setTimeout(() => {
                     this.simulateOpponentTurn();

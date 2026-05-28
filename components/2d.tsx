@@ -1,11 +1,18 @@
 import { useContext } from "react";
 import { GameContext } from "@/app/page";
-import { Card } from "./card";
+import { Card, FaceUpCard } from "./card";
 import {
   CircleUser,
   Zap,
   Timer
 } from "lucide-react";
+
+const suits: { [key: string]: string } = {
+    "h": "Hearts",
+    "d": "Diamonds",
+    "c": "Clubs",
+    "s": "Spades"
+}
 
 function Instruction() { // instruction widget at top left of screen
   const game = useContext(GameContext);
@@ -17,7 +24,7 @@ function Instruction() { // instruction widget at top left of screen
   return (
     <div className="absolute top-18 left-4 section w-72 rounded-md shadow-md flex items-center justify-center px-4 py-2 bg-gray-200">
       {game.action.agent === "player" || game.action.agent === "both" ? (
-        <p className="text-center text-gray-700 truncate">{action.type === "start" ? "Look at two of your cards." : action.type === "pickup" ? "Pick up a card from the deck." : action.type === "discard" ? "Discard a card from your hand." : `Use the ${action.type} card.`}</p>
+        <p className="text-center text-gray-700 truncate">{action.type === "start" ? "Look at two of your cards." : action.type === "pickup" ? "Pick up a card from the deck." : action.type === "discard" ? "Discard a card from your hand." : action.type === "snap" ? `Snap a card if you have one.` : `Use the ${action.type} card.`}</p>
       ) : (
         <p className="text-center text-gray-700 truncate">Waiting for opponent...</p>
       )}
@@ -35,6 +42,49 @@ export default function TwoD() { // 2d game component, 2d version of game
     const nw = game.nw;
     const cw = game.cw;
     const discarded = game.discarded;
+
+
+    // special buttons
+    function endgame(e: React.MouseEvent<HTMLParagraphElement>) {
+      // nothing yet
+      return;
+    }
+
+    function snap(e: React.MouseEvent<HTMLParagraphElement>) {
+      if (!game) {
+        console.log("Game not found.")
+        return;
+      }
+      if (game.snapTimer === 0) {
+        console.log("Snap time ran out.")
+        nw.post("The snap timer has run out. Try again next turn.", "warning");
+        return;
+      }
+
+      for (const card of game.userCards) {
+        console.log(card.snapSelected);
+        if (!card.snapSelected) continue;
+        if (card.rank !== discarded[discarded.length - 1].rank) {
+          nw.post("You incorrectly snapped a card. You have now gained a penalty card.", "error");
+          const newCard = game.deck.draw();
+          if (!newCard) {
+            nw.post("Failed to draw a new card.", "error");
+            return;
+          }
+          game.deck.user.push(newCard);
+          nw.post("You have gained a penalty card.", "info");
+          continue;
+        }
+
+        console.log("Correctly snapped");
+        const newDiscarded = [...discarded, new FaceUpCard(card.rank, card.suit, game, nw, cw)];
+        const cardPos = game.deck.user.findIndex(c => c[0] === card.rank && c[1] === card.suit);
+        game.deck.user.splice(cardPos, 1);
+        nw.post(`You correctly snapped a ${card.rank} of ${suits[card.suit].toLowerCase()}. It has been discarded.`, "info");
+        game.setDiscarded(newDiscarded);
+        continue;
+      }
+    }
     
 
     // screen
@@ -111,12 +161,12 @@ export default function TwoD() { // 2d game component, 2d version of game
               <div className="relative group flex flex-row justify-center items-center hover:cursor-pointer hover:-translate-y-0.5 gap-2 section px-3 py-2 shadow-sm rounded-md transition-transform duration-200">
                 <Timer />
                 <p className="translate-y-0.5 font-semibold text-gray-800">ENDGAME</p>
-                <div className="absolute w-full h-full bg-red-800 rounded-md tintedRed opacity-20 group-hover:opacity-25 transition-opacity duration-200" />
+                <div className="absolute w-full h-full bg-red-800 rounded-md tintedRed opacity-20 group-hover:opacity-25 transition-opacity duration-200" onClick={endgame} />
               </div>
               <div className="relative group flex flex-row justify-center items-center hover:cursor-pointer hover:-translate-y-0.5 gap-2 section px-3 py-2 shadow-sm rounded-md transition-transform duration-200">
                 <Zap />
                 <p className="translate-y-0.5 font-semibold text-gray-800">SNAP</p>
-                <div className="absolute w-full h-full bg-blue-800 rounded-md tintedBlue opacity-20 group-hover:opacity-25 transition-opacity duration-200" />
+                <div className="absolute w-full h-full bg-blue-800 rounded-md tintedBlue opacity-20 group-hover:opacity-25 transition-opacity duration-200" onClick={snap} />
               </div>
             </div>
           </div>
