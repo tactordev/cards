@@ -9,7 +9,8 @@ import TwoD from "@/components/2d";
 import ThreeD from "@/components/3d";
 import {
   Info,
-  Coffee
+  Coffee,
+  CircleStar
 } from "lucide-react";
 // <img src="https://i.ibb.co/xKdhCXTY/card-mockup.png" alt="card mockup" border="0">
 
@@ -30,11 +31,14 @@ function GameTypeSelector({ type, setType }: { type: 2 | 3, setType: (type: 2 | 
 function Helps() { // helping buttons below the widgets on left of screen
   return (
     <div className="absolute top-178 left-4 flex flex-row gap-2">
-      <div className="section px-3 group py-2 shadow-sm rounded-md hover:cursor-pointer hover:-translate-y-0.5 transition-transform duration-200" title="Rules">
+      <div className="section px-3 group py-2 shadow-sm rounded-md hover:cursor-pointer hover:-translate-y-0.5 transition-transform duration-200" title="Rules" onClick={() => window.open(`${window.location.origin}/rules`, "_blank")}>
         <Info className="w-6 h-6 text-gray-500 inline-block group-hover:text-blue-500 transition-colors duration-200" />
       </div>
       <div className="section px-3 group py-2 shadow-sm rounded-md hover:cursor-pointer hover:-translate-y-0.5 transition-transform duration-200" title="Buy me a coffee" onClick={() => window.open("https://www.ko-fi.com/tactor", "_blank")}>
         <Coffee className="w-6 h-6 text-gray-500 inline-block group-hover:text-yellow-500 transition-colors duration-200" />
+      </div>
+      <div className="section px-3 group py-2 shadow-sm rounded-md hover:cursor-pointer hover:-translate-y-0.5 transition-transform duration-200" title="Credits" onClick={() => window.open(`${window.location.origin}/credits`, "_blank")}>
+        <CircleStar className="w-6 h-6 text-gray-500 inline-block group-hover:text-purple-500 transition-colors duration-200" />
       </div>
     </div>
   )
