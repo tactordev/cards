@@ -1,6 +1,7 @@
 import { Game } from "@/components/flow";
 import { NotificationWindow } from "@/components/nw";
 import { CardWindow } from "@/components/cw";
+import { AnimatePresence } from "framer-motion";
 
 const suits: { [key: string]: string } = {
     h: "Hearts",
@@ -8,6 +9,24 @@ const suits: { [key: string]: string } = {
     c: "Clubs",
     s: "Spades",
 } // used for getting full names of suits
+
+function getElementCenter(el: Element) {
+    const rect = el.getBoundingClientRect();
+    return {
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2,
+    };
+}
+
+function motionFromElementToSelector(source: Element, targetSelector: string): [number, number] | undefined {
+    const target = document.querySelector(targetSelector);
+    if (!target) return undefined;
+
+    const sourceCenter = getElementCenter(source);
+    const targetCenter = getElementCenter(target);
+
+    return [sourceCenter.x - targetCenter.x, sourceCenter.y - targetCenter.y];
+}
 
 class Card {
 
@@ -17,13 +36,15 @@ class Card {
     public game: Game; 
     public viewing: boolean = false;
     public snapSelected: boolean = false;
+    public initialPos?: [number, number];
+    public lastRect?: DOMRect;
     private nw: NotificationWindow;
     private cw: CardWindow;
     
 
 
 
-    constructor(rank: string, suit: string, game: Game, nw: NotificationWindow, cw: CardWindow) {
+    constructor(rank: string, suit: string, game: Game, nw: NotificationWindow, cw: CardWindow, initialPos?: [number, number]) {
         // attributes
         this.suit = suit;
         this.rank = rank;
@@ -31,9 +52,13 @@ class Card {
         this.nw = nw;
         this.cw = cw;
         this.snapSelected = false;
+        this.initialPos = initialPos;
+        this.lastRect = undefined;
     }
 
     handler(event: React.MouseEvent<HTMLDivElement>) { // handles clicking of cards (in hand, deck and cw)
+        this.lastRect = event.currentTarget.getBoundingClientRect();
+
         if (!this.game.isPlayerTurn()) { // if it isn't the player's turn, they shouldn't be clicking anything
             // NOTE: add check for snap later on when snap functionality is added
             this.nw.post("You cannot use this card when it's not your turn.", "warning");
@@ -71,7 +96,8 @@ class Card {
                 return;
             }
 
-            const res = this.cw.show(new FaceUpCard(newCard[0], newCard[1], this.game, this.nw, this.cw)); // shows picked up card in cw
+            const drawInitialPos = motionFromElementToSelector(event.currentTarget, ".cw-card-slot");
+            const res = this.cw.show(new FaceUpCard(newCard[0], newCard[1], this.game, this.nw, this.cw, drawInitialPos));
             this.nw.post("You picked up a new card. View it in the card viewer. Select a card to discard.", "info");
             this.game.triggerNextAction(); // increments to next action (probably discarding a card in this instance)
 
@@ -82,7 +108,8 @@ class Card {
 
                 // gets card, updates discard pile, updates react state, replaces card in player's hand, notifies user, triggers next action
                 const cardToDiscard = `${this.rank}${this.suit}`;
-                const newDiscarded = [...this.game.discarded, new FaceUpCard(this.rank, this.suit, this.game, this.nw, this.cw)];
+                const discardInitialPos = motionFromElementToSelector(event.currentTarget, ".discard-pile-slot");
+                const newDiscarded = [...this.game.discarded, new FaceUpCard(this.rank, this.suit, this.game, this.nw, this.cw, discardInitialPos)];
                 this.game.setDiscarded(newDiscarded);
                 const cardPos = this.game.deck.user.indexOf(cardToDiscard);
                 const newUserCards = this.game.deck.user.filter(card => card !== cardToDiscard);
@@ -120,7 +147,8 @@ class Card {
                 const curTarget = event.currentTarget;
                 const imel = event.currentTarget.children[0] as HTMLImageElement;
                 curTarget.classList.add("start-checked");
-                const res = this.cw.show(new FaceUpCard(this.rank, this.suit, this.game, this.nw, this.cw));
+                const startInitialPos = motionFromElementToSelector(event.currentTarget, ".cw-card-slot");
+                const res = this.cw.show(new FaceUpCard(this.rank, this.suit, this.game, this.nw, this.cw, startInitialPos));
                 imel.classList.add("invisible");
                 this.cw.timer(5);
 
@@ -162,7 +190,8 @@ class Card {
 
             if (curAction === "discard") { // if it's their turn to discard, then they can discard the card they just picked up (which would therefore be in the cw)
                 const cardToDiscard = `${this.cw.content()!.rank}${this.cw.content()!.suit}`;
-                const newDiscarded = [...this.game.discarded, new FaceUpCard(this.rank, this.suit, this.game, this.nw, this.cw)];
+                const discardInitialPos = motionFromElementToSelector(event.currentTarget, ".discard-pile-slot");
+                const newDiscarded = [...this.game.discarded, new FaceUpCard(this.rank, this.suit, this.game, this.nw, this.cw, discardInitialPos)];
                 this.game.setDiscarded(newDiscarded);
                 this.cw.hide();
                 this.nw.post(`You discarded a ${this.rank} of ${suits[this.suit].toLowerCase()}.`, "info");
@@ -206,9 +235,9 @@ class Card {
 
 class FaceUpCard extends Card { // card but instead of seeing my marvelous card back design, you can see the horrible card (you should definitely only look at my design)
     
-
-    constructor(rank: string, suit: string, game: Game, nw: NotificationWindow, cw: CardWindow) { // uh not much to say
+    constructor(rank: string, suit: string, game: Game, nw: NotificationWindow, cw: CardWindow, initialPos?: [number, number]) { // uh not much to say
         super(rank, suit, game, nw, cw);
+        this.initialPos = initialPos;
     }
 
 
@@ -223,4 +252,4 @@ class FaceUpCard extends Card { // card but instead of seeing my marvelous card 
 }
 
 
-export { Card, FaceUpCard };
+export { Card, FaceUpCard, motionFromElementToSelector };

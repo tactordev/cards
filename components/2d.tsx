@@ -1,3 +1,4 @@
+"use client";
 import { useContext } from "react";
 import { GameContext } from "@/app/page";
 import { Card, FaceUpCard } from "./card";
@@ -6,6 +7,7 @@ import {
   Zap,
   Timer
 } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 
 const suits: { [key: string]: string } = {
     "h": "Hearts",
@@ -42,6 +44,7 @@ export default function TwoD() { // 2d game component, 2d version of game
     const nw = game.nw;
     const cw = game.cw;
     const discarded = game.discarded;
+    const lastDiscard = discarded.length > 0 ? discarded[discarded.length - 1] : undefined;
 
 
     // special buttons
@@ -77,7 +80,18 @@ export default function TwoD() { // 2d game component, 2d version of game
         }
 
         console.log("Correctly snapped");
-        const newDiscarded = [...discarded, new FaceUpCard(card.rank, card.suit, game, nw, cw)];
+        const discardSlot = document.querySelector(".discard-pile-slot");
+        let snapInitialPos: [number, number] | undefined;
+        if (discardSlot && card.lastRect) {
+          const discardRect = discardSlot.getBoundingClientRect();
+          const sourceCenterX = card.lastRect.left + card.lastRect.width / 2;
+          const sourceCenterY = card.lastRect.top + card.lastRect.height / 2;
+          const targetCenterX = discardRect.left + discardRect.width / 2;
+          const targetCenterY = discardRect.top + discardRect.height / 2;
+          snapInitialPos = [sourceCenterX - targetCenterX, sourceCenterY - targetCenterY];
+        }
+
+        const newDiscarded = [...discarded, new FaceUpCard(card.rank, card.suit, game, nw, cw, snapInitialPos)];
         const cardPos = game.deck.user.findIndex(c => c[0] === card.rank && c[1] === card.suit);
         game.deck.user.splice(cardPos, 1);
         nw.post(`You correctly snapped a ${card.rank} of ${suits[card.suit].toLowerCase()}. It has been discarded.`, "info");
@@ -97,13 +111,13 @@ export default function TwoD() { // 2d game component, 2d version of game
               <CircleUser className="w-8 h-8 text-gray-800" />
               <p className="text-lg font-bold text-gray-800">Automated Opponent</p>
             </div>
-            <div className="flex flex-row relative gap-2">
+            <motion.div className="flex flex-row relative gap-2">
               { 
                 game!.deck.opponent.map((card, index) => (
                   <div className="rotate-180" key={index}>{new Card(card[0], card[1], game, nw, cw).render("opponent-card", index)}</div>
                 ))
               }
-            </div>
+            </motion.div>
           </div>
 
           {/* table of play */}
@@ -119,13 +133,23 @@ export default function TwoD() { // 2d game component, 2d version of game
               </div>
 
               {/* discard pile */}
-              { 
-                discarded.length > 0 ? (
-                  <div>
-                    {[discarded[discarded.length - 1].render("discarded-card", -2)]}
-                  </div>
-                ) : <div className="h-38 w-24 bg-gray-300 rounded-md flex items-center justify-center" />
-              }
+              <div className="discard-pile-slot h-38 w-24 flex items-center justify-center">
+                <AnimatePresence mode="popLayout">
+                  { 
+                    discarded.length > 0 ? (
+                        <motion.div
+                          key={`${lastDiscard?.rank ?? "x"}${lastDiscard?.suit ?? "x"}-${discarded.length}`}
+                          initial={{ opacity: 0, scale: 0.5, x: lastDiscard?.initialPos ? lastDiscard.initialPos[0] : 0, y: lastDiscard?.initialPos ? lastDiscard.initialPos[1] : 0 }}
+                        animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.5 }}
+                        transition={{ duration: 0.35, ease: "easeInOut" }}
+                      >
+                        {[discarded[discarded.length - 1].render("discarded-card", -2)]}
+                      </motion.div>
+                    ) : <div className="h-38 w-24 bg-gray-300 rounded-md flex items-center justify-center" />
+                  }
+                </AnimatePresence>
+              </div>
             </div>
 
 
@@ -148,12 +172,17 @@ export default function TwoD() { // 2d game component, 2d version of game
                 <CircleUser className="w-8 h-8 text-gray-800" />
                 <p className="text-lg font-bold text-gray-800">Your Cards</p>
               </div>
-              <div className="flex flex-row relative items-center gap-2 justify-center">
+              <motion.div
+                className="flex flex-row relative items-center gap-2 justify-center"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: "easeInOut", delay: 0.35 }}
+              >
 
                 { game.deck.user.map((card, index) => (
                   new Card(card[0], card[1], game, nw, cw).render("player-card", index)
                 ))}
-              </div>
+              </motion.div>
             </div>
 
             {/* actions */}

@@ -108,7 +108,20 @@ class Game {
         // discarding
         const randomNum = Math.floor(Math.random() * 4);
         const cardToDiscard = this.deck.opponent[randomNum];
-        const newDiscarded = [...this.discarded, new FaceUpCard(cardToDiscard[0], cardToDiscard[1], this, this.nw, this.cw)];
+        const discardSlot = document.querySelector(".discard-pile-slot");
+        const opponentZone = document.querySelector(".opponent-cards");
+        let discardInitialPos: [number, number] | undefined;
+        if (discardSlot && opponentZone) {
+            const sourceRect = opponentZone.getBoundingClientRect();
+            const targetRect = discardSlot.getBoundingClientRect();
+            const sourceCenterX = sourceRect.left + sourceRect.width / 2;
+            const sourceCenterY = sourceRect.top + sourceRect.height / 2;
+            const targetCenterX = targetRect.left + targetRect.width / 2;
+            const targetCenterY = targetRect.top + targetRect.height / 2;
+            discardInitialPos = [sourceCenterX - targetCenterX, sourceCenterY - targetCenterY];
+        }
+
+        const newDiscarded = [...this.discarded, new FaceUpCard(cardToDiscard[0], cardToDiscard[1], this, this.nw, this.cw, discardInitialPos)];
         this.setDiscarded(newDiscarded);
         const cardPos = this.deck.opponent.indexOf(cardToDiscard);
         this.deck.opponent.splice(cardPos, 1, newCard);
