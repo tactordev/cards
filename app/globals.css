@@ -35,3 +35,21 @@ body {
 .section {
   background-image: linear-gradient(to top, #e6e9f0 0%, #eef1f5 100%);
 }
+
+.tintedRed {
+  /*
+    * Created with https://www.css-gradient.com
+    * Gradient link: https://www.css-gradient.com/?c1=fc8db3&c2=ed4e69&gt=l&gd=dbr
+  */
+  background: #FC8DB3;
+  background: linear-gradient(135deg, #FC8DB3, #ED4E69);
+}
+
+.tintedBlue {
+  /*
+    * Created with https://www.css-gradient.com
+    * Gradient link: https://www.css-gradient.com/?c1=6d90c7&c2=8ba1ed&gt=l&gd=dbr
+  */
+  background: #6D90C7;
+  background: linear-gradient(135deg, #6D90C7, #8BA1ED);
+}

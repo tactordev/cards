@@ -1,8 +1,6 @@
 import { Game } from "@/components/flow";
 import { NotificationWindow } from "@/components/nw";
 import { CardWindow } from "@/components/cw";
-import { useContext } from "react";
-import { GameContext } from "@/app/page";
 
 const suits: { [key: string]: string } = {
     h: "Hearts",
@@ -15,6 +13,7 @@ class Card {
     public suit: string;
     public rank: string;
     public game: Game; 
+    public viewing: boolean = false;
     private nw: NotificationWindow;
     private cw: CardWindow;
     
@@ -91,19 +90,28 @@ class Card {
                     return;
                 }
                 this.nw.post("Go look at your card and make sure not to forget it. You can only look at this once.", "info");
-                event.currentTarget.classList.add("start-checked");
+                const curTarget = event.currentTarget;
+                const imel = event.currentTarget.children[0] as HTMLImageElement;
+                curTarget.classList.add("start-checked");
                 const res = this.cw.show(new FaceUpCard(this.rank, this.suit, this.game, this.nw, this.cw));
-                console.log("")
+                imel.classList.add("invisible");
                 this.cw.timer(5);
-                this.game.setAction({
-                    agent: this.game.action.agent,
-                    type: this.game.action.type,
-                    config: this.game.getActionConfig() - 1,
-                });
-                if (this.game.getActionConfig() === 0) {
-                    this.game.triggerNextAction();
-                }
-                return;
+
+                setTimeout(() => {
+                    this.game.setAction({
+                        agent: this.game.action.agent,
+                        type: this.game.action.type,
+                        config: this.game.getActionConfig() - 1,
+                    });
+                    imel.classList.remove("invisible");
+                    if (this.game.getActionConfig() === 0) {
+                        this.game.triggerNextAction();
+                    }
+
+                    return;
+                }, 5000);
+                
+
             } else {
                 this.nw.post("You can only check your own cards at the start of the game or when playing Jack.", "warning");
             }
@@ -133,8 +141,8 @@ class Card {
 
     render(type: string, index?: number) {
         return (
-            <div className={`${type} hover:cursor-pointer hover:border-3 hover:border-yellow-500 border-inset`} onClick={(event) => this.handler(event)} key={index}>
-                <img src="https://i.ibb.co/xKdhCXTY/card-mockup.png" alt="card mockup" className="h-36 w-24" />
+            <div className={`${type} hover:cursor-pointer border-3 border-transparent hover:border-yellow-500 border-inset transition-colors duration-200 h-38 w-24 bg-gray-300 rounded-md flex items-center justify-center`} onClick={(event) => this.handler(event)} key={index}>
+                <img src="/models/cards/back.png" alt="card mockup" className={`h-36 w-24`} />
             </div>
         )
     }

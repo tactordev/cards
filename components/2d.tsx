@@ -2,7 +2,9 @@ import { useContext } from "react";
 import { GameContext } from "@/app/page";
 import { Card } from "./card";
 import {
-  CircleUser
+  CircleUser,
+  Zap,
+  Timer
 } from "lucide-react";
 
 function Instruction() {
@@ -42,7 +44,7 @@ export default function TwoD() {
             <div className="flex flex-row relative gap-2">
               { 
                 game!.deck.opponent.map((card, index) => (
-                  new Card(card[0], card[1], game, nw, cw).render("opponent-card", index)
+                  <div className="rotate-180" key={index}>{new Card(card[0], card[1], game, nw, cw).render("opponent-card", index)}</div>
                 ))
               }
             </div>
@@ -60,19 +62,33 @@ export default function TwoD() {
                 <div>
                   {[discarded[discarded.length - 1].render("discarded-card", -2)]}
                 </div>
-              ) : <div className="h-36 w-24 bg-gray-300 rounded-md flex items-center justify-center" />
+              ) : <div className="h-38 w-24 bg-gray-300 rounded-md flex items-center justify-center" />
             }
           </div>
-          <div className="relative section px-12 py-4 rounded-md flex flex-col shadow-md player-cards gap-2">
-            <div className="flex flex-row items-center gap-2 justify-center items-center">
-              <CircleUser className="w-8 h-8 text-gray-800" />
-              <p className="text-lg font-bold text-gray-800">Your Cards</p>
-            </div>
-            <div className="flex flex-row relative items-center gap-2 justify-center">
+          <div className="relative flex flex-row justify-center">
+            <div className="relative section px-12 py-4 rounded-md flex flex-col shadow-md player-cards gap-2">
+              <div className="flex flex-row items-center gap-2 justify-center items-center">
+                <CircleUser className="w-8 h-8 text-gray-800" />
+                <p className="text-lg font-bold text-gray-800">Your Cards</p>
+              </div>
+              <div className="flex flex-row relative items-center gap-2 justify-center">
 
-              { game.deck.user.map((card, index) => (
-                new Card(card[0], card[1], game, nw, cw).render("player-card", index)
-              ))}
+                { game.deck.user.map((card, index) => (
+                  new Card(card[0], card[1], game, nw, cw).render("player-card", index)
+                ))}
+              </div>
+            </div>
+            <div className="absolute flex flex-col bottom-0 -right-36 gap-4">
+              <div className="relative group flex flex-row justify-center items-center hover:cursor-pointer hover:-translate-y-0.5 gap-2 section px-3 py-2 shadow-sm rounded-md transition-transform duration-200">
+                <Timer />
+                <p className="translate-y-0.5 font-semibold text-gray-800">ENDGAME</p>
+                <div className="absolute w-full h-full bg-red-800 rounded-md tintedRed opacity-20 group-hover:opacity-25 transition-opacity duration-200" />
+              </div>
+              <div className="relative group flex flex-row justify-center items-center hover:cursor-pointer hover:-translate-y-0.5 gap-2 section px-3 py-2 shadow-sm rounded-md transition-transform duration-200">
+                <Zap />
+                <p className="translate-y-0.5 font-semibold text-gray-800">SNAP</p>
+                <div className="absolute w-full h-full bg-blue-800 rounded-md tintedBlue opacity-20 group-hover:opacity-25 transition-opacity duration-200" />
+              </div>
             </div>
           </div>
           <Instruction />
