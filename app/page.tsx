@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, createContext  } from "react";
+import { useState, createContext, useReducer  } from "react";
 import { Action } from "@/components/flow";
 import { Game } from "@/components/flow";
 import { NotificationWindow } from "@/components/nw";
@@ -51,7 +51,7 @@ export default function MainGame() {
   // game state
   const [gameType, setGameType] = useState<2 | 3>(2);
 
-
+  const [, forceRender] = useReducer(x => x + 1, 0); 
 
   const [action, setAction] = useState<Action>({ agent: "both", type: "start", config: { amount: 2, next: "player" } }); // actionId, person, action, config
   const [opponentKnows, setOpponentKnows] = useState<{location: string, card: [string, string]}[]>([]); // cards opponent knows (from what they've seen)
@@ -62,7 +62,7 @@ export default function MainGame() {
   const cw = new CardWindow(nw, card, setCard, time, setTimer); // card window
   const [discarded, setDiscarded] = useState<FaceUpCard[]>([]); // discarded card pile
   const [snapTimer, setSnapTimer] = useState<number>(0); // timer for snap action
-  const [game, setGame] = useState(() => new Game(action, setAction, opponentKnows, setOpponentKnows, nw, cw, discarded, setDiscarded, snapTimer, setSnapTimer)); // game
+  const [game, setGame] = useState(() => new Game(action, setAction, opponentKnows, setOpponentKnows, nw, cw, discarded, setDiscarded, snapTimer, setSnapTimer, forceRender)); // game
 
   function finalScores() { // final score calculator
     const userTotal = game.deck.user.map(card => card[0]).reduce((sum, rank) => {
@@ -84,7 +84,7 @@ export default function MainGame() {
     )
   }
 
-  const content = (game.deck.deck.length > 0 || game.deck.user.length > 0 || game.deck.opponent.length > 0 || game.deck.user.length > 6) // changes content depending on game state
+  const content = (game.deck.deck.length > 0 && game.deck.user.length > 0 && game.deck.opponent.length > 0 && game.deck.user.length < 6) // changes content depending on game state
     ? gameType === 2
       ? <TwoD />
       : <ThreeD /> // 2d / 3d switch

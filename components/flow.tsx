@@ -29,10 +29,23 @@ class Game {
     public snapTimer: number;
     public setSnapTimer: (timer: number) => void;
     public userCards: Card[];
+    public forceRerender: () => void;
     private snapTimeoutId: ReturnType<typeof setTimeout> | null;
     private snapIntervalId: ReturnType<typeof setInterval> | null;
 
-    constructor(action: Action, setAction: (action: Action) => void, opponentKnows: {location: string, card: [string, string]}[], setOpponentKnows: (opponentKnows: {location: string, card: [string, string]}[]) => void, nw: NotificationWindow, cw: CardWindow, discarded: FaceUpCard[], setDiscarded: (discarded: FaceUpCard[]) => void, snapTimer: number, setSnapTimer: (timer: number) => void) {
+    constructor(
+        action: Action,
+        setAction: (action: Action) => void,
+        opponentKnows: {location: string, card: [string, string]}[],
+        setOpponentKnows: (opponentKnows: {location: string, card: [string, string]}[]) => void,
+        nw: NotificationWindow,
+        cw: CardWindow,
+        discarded: FaceUpCard[],
+        setDiscarded: (discarded: FaceUpCard[]) => void,
+        snapTimer: number,
+        setSnapTimer: (timer: number) => void,
+        forceRerender: () => void
+    ) {
         // attributes
         this.nw = nw;
         this.cw = cw;
@@ -52,10 +65,12 @@ class Game {
             this.snapTimer = timer;
             setSnapTimer(timer);
         };
+        this.forceRerender = forceRerender;
         this.snapTimeoutId = null;
         this.snapIntervalId = null;
         this.userCards = [];
     }
+    
 
     isPlayerTurn() { // checks if it is the player's turn (obv)
         if (this.action.agent === "both" || this.action.agent === "player") return true;
@@ -68,6 +83,7 @@ class Game {
     }
 
     simulateOpponentTurn() { // simulates opponent's turn. no real strategy involved, all random. maybe I'll add strategy in the future but idk how to make something that's balanced.
+        this.forceRerender();
         // pickup card
         // randomly discard a card
 
@@ -109,6 +125,7 @@ class Game {
     }
 
     triggerNextAction() { // increment to the next action
+        this.forceRerender();
         if (this.action.type === "start") {
             this.setAction({
                 agent: "player",
