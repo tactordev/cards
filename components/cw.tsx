@@ -8,6 +8,8 @@ import { Card, FaceUpCard } from "./card";
 import { GameContext } from "@/app/page";
 
 class CardWindow {
+
+    // attributes
     private card: FaceUpCard | null;
     private setCard: (card: FaceUpCard | null) => void;
     private time: number | null
@@ -17,6 +19,7 @@ class CardWindow {
     private nw: NotificationWindow;
 
     constructor(nw: NotificationWindow, card: FaceUpCard | null, setCard: (card: FaceUpCard | null) => void, time: number | null, setTimer: (timer: number | null) => void) {
+        // more attributes
         this.card = card;
         this.setCard = ((card: FaceUpCard | null) => {
             this.card = card;
@@ -33,7 +36,7 @@ class CardWindow {
 
     }
 
-    render() {
+    render() { // render card window widget onto screen (top left)
         return (
             <div className="absolute section shadow-sm left-4 w-72 h-72 top-30 rounded-md shadow-md flex flex-col bg-gray-200 items-center pt-4">
                 <div className="relative flex flex-col w-full h-full items-center justify-center">
@@ -58,7 +61,7 @@ class CardWindow {
         )
     }
 
-    show(card: FaceUpCard) {
+    show(card: FaceUpCard) { // show a card in the viewer
         if (this.card) {
             this.nw.post("You are already viewing a card. Please discard this card or wait for the timer to elapse before selecting a new one.", "warning");
             return false;
@@ -67,7 +70,7 @@ class CardWindow {
         return true;
     }
 
-    hide() {
+    hide() { // remove the current card from the viewer + clear timers
         this.setCard(null);
         if (this.timerId) {
             clearTimeout(this.timerId);
@@ -79,7 +82,7 @@ class CardWindow {
         }
     }
 
-    timer(seconds: number) {
+    timer(seconds: number) { // set a timer (they can only see a card for a set amount of time)
         if (this.timerId) {
             clearTimeout(this.timerId);
         }
@@ -107,12 +110,12 @@ class CardWindow {
         return;
     }
 
-    presence() {
+    presence() { // checks if there is currently a card in the cw 
         if (this.card) return true;
         return false;
     }
 
-    content() {
+    content() { // gets the content from the cw. This kinda makes presence redundant
         return this.card;
     }
 }

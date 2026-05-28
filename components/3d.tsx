@@ -4,6 +4,9 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { useGLTF, PresentationControls, OrbitControls, Center, Resize } from "@react-three/drei";
 import * as three from "three";
 
+
+// READ: unfinished
+
 // always:
 // scene, camera, renderer
 

@@ -7,13 +7,18 @@ import { FaceUpCard } from "./card";
 
 type Action = {
     agent: "player" | "opponent" | "both";
-    type: "start" | "pickup" | "discard" | "jack" | "jack-snapped" | "queen" | "queen-snapped" | "king" | "king-snapped";
-    config: number;
-}
+    type: "start" | "pickup" | "discard" | "jack" | "jack-snapped" | "queen" | "queen-snapped" | "black_king" | "black_king-snapped";
+    config: {
+        amount: number;
+        next: "player" | "opponent";
+    };
+} // action type
 
 
 
 class Game {
+
+    // attributes
     public deck: Deck; 
     public nw: NotificationWindow;
     public cw: CardWindow;
@@ -23,6 +28,7 @@ class Game {
     public setDiscarded: (discarded: FaceUpCard[]) => void;
 
     constructor(action: Action, setAction: (action: Action) => void, opponentKnows: {location: string, card: [string, string]}[], setOpponentKnows: (opponentKnows: {location: string, card: [string, string]}[]) => void, nw: NotificationWindow, cw: CardWindow, discarded: FaceUpCard[], setDiscarded: (discarded: FaceUpCard[]) => void) {
+        // attributes
         this.nw = nw;
         this.cw = cw;
         this.deck = new Deck(this.nw, this.cw, this);
@@ -38,17 +44,17 @@ class Game {
         };
     }
 
-    isPlayerTurn() {
+    isPlayerTurn() { // checks if it is the player's turn (obv)
         if (this.action.agent === "both" || this.action.agent === "player") return true;
         return false;
     }
 
-    isOpponentTurn() {
+    isOpponentTurn() { // take a wild guess
         if (this.action.agent === "both" || this.action.agent === "opponent") return true;
         return false;
     }
 
-    simulateOpponentTurn() {
+    simulateOpponentTurn() { // simulates opponent's turn. no real strategy involved, all random. maybe I'll add strategy in the future but idk how to make something that's balanced.
         // pickup card
         // randomly discard a card
 
@@ -81,52 +87,81 @@ class Game {
         this.triggerNextAction();
     }
 
-    getActionType() {
+    getActionType() { // get the type of action
         return this.action.type;
     }
 
-    getActionConfig() {
+    getActionConfig() { // get the config for the current action
         return this.action.config;
     }
 
-    triggerNextAction() {
+    triggerNextAction() { // increment to the next action
+
         if (this.action.type === "start") {
             this.setAction({
                 agent: "player",
                 type: "pickup",
-                config: 1,
-            });
+                config: {
+                    amount: 1,
+                    next: "player",
+                }
+            }); // always sets it to 1. there is a check in card.tsx which will change from start to pickup when the start is finished
             this.nw.post("It is now your turn. Pick up a card from the deck.", "info");
-        } else if (this.action.type === "pickup") {
+
+
+        } else if (this.action.type === "pickup") { // pick up card --> discard a card
             this.setAction({
                 agent: this.action.agent,
                 type: "discard",
-                config: 1,
+                config: {
+                    amount: 1,
+                    next: this.action.agent === "player" ? "opponent" : "player",
+                },
             });
             this.nw.post("Discard a card from your hand.", "info");
-        } else if (this.action.type === "discard") {
+
+
+
+        } else if (this.action.type === "discard") { // discard a card --> switch turns (in future: special card action, snap, then switch turns)
             this.setAction({
                 agent: this.action.agent === "player" ? "opponent" : "player",
                 type: "pickup",
-                config: 1,
+                config: {
+                    amount: 1,
+                    next: this.action.agent === "player" ? "opponent" : "player",
+                },
             });
             this.nw.post(`It is now ${this.isPlayerTurn() ? "your" : "opponent's"} turn. ${this.isPlayerTurn() ? "Pick up a card from the deck." : "Opponent is picking up a card..."}`, "info");
+
+            // simulates the opponent's turn
             if (this.isOpponentTurn()) {
                 setTimeout(() => {
                     this.simulateOpponentTurn();
                 }, 500);
             }
-        } else if (this.action.type === "jack" || this.action.type === "queen" || this.action.type === "king") {
+
+        
+
+        // ----#### THESE FEATURES HAVE NOT BEEN MADE YET ####----
+        } else if (this.action.type === "jack" || this.action.type === "queen" || this.action.type === "black_king") { // special cards
             this.setAction({
                 agent: this.action.agent === "player" ? "opponent" : "player",
                 type: "pickup",
-                config: 1,
+                config: {
+                    amount: 1,
+                    next: this.action.agent === "player" ? "opponent" : "player",
+                },
             });
-        } else if (this.action.type === "jack-snapped" || this.action.type === "queen-snapped" || this.action.type === "king-snapped") {
+
+
+        } else if (this.action.type === "jack-snapped" || this.action.type === "queen-snapped" || this.action.type === "black_king-snapped") { // special cards but if they were snapped and not discarded
             this.setAction({
                 agent: this.action.agent === "player" ? "opponent" : "player",
                 type: "pickup",
-                config: 1,
+                config: {
+                    amount: 1,
+                    next: this.action.agent === "player" ? "opponent" : "player",
+                },
             });
         }
 

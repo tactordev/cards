@@ -4,7 +4,7 @@ import { CardWindow } from "@/components/cw";
 
 
 
-function randomiseCards() {
+function randomiseCards() { // randomises (shuffles) the deck
     const allCards = {
         ranks: "2 3 4 5 6 7 8 9 T J Q K A".split(" "),
         suits: "hearts diamonds clubs spades".split(" "),
@@ -22,6 +22,8 @@ function randomiseCards() {
 
 
 class Deck {
+
+    // attributes
     public deck: string[];
     public user: string[];
     public opponent: string[];
@@ -31,21 +33,22 @@ class Deck {
         cw: CardWindow,
         game: Game,
     ) {
+        // more attributes
         const { deck, user, opponent } = randomiseCards();
         this.deck = deck;
         this.user = user;
         this.opponent = opponent;
     }
 
-    draw() {
+    draw() { // draw a card from the top of the deck.
         return this.deck.shift();
     }
 
-    top() {
+    top() { // check the top card of the deck
         return this.deck[0];
     }
 
-    bottom() {
+    bottom() { // check the bottom card of the deck
         return this.deck[this.deck.length - 1];
     }
 }

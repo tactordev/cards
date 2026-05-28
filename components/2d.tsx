@@ -7,7 +7,7 @@ import {
   Timer
 } from "lucide-react";
 
-function Instruction() {
+function Instruction() { // instruction widget at top left of screen
   const game = useContext(GameContext);
   if (!game) {
     return <div>Loading...</div>;
@@ -24,18 +24,24 @@ function Instruction() {
     </div>
   )
 }
-export default function TwoD() {
-    const game = useContext(GameContext);
+
+export default function TwoD() { // 2d game component, 2d version of game
+    const game = useContext(GameContext); // gets game context
     if (!game) {
         return <div>Loading...</div>;
     }
     
+    // declarations
     const nw = game.nw;
     const cw = game.cw;
     const discarded = game.discarded;
     
+
+    // screen
     return (
         <div className="flex flex-col gap-8 w-full h-screen items-center justify-center">
+
+          {/* opponent information */}
           <div className="relative section flex flex-col opponent-cards gap-2 px-12 py-4 rounded-md shadow-md">
             <div className="flex flex-row items-center gap-2 justify-center items-center">
               <CircleUser className="w-8 h-8 text-gray-800" />
@@ -48,8 +54,9 @@ export default function TwoD() {
                 ))
               }
             </div>
-
           </div>
+
+          {/* deck and discard pile */}
           <div className="card-deck relative section px-12 py-4 rounded-md shadow-md flex flex-row gap-2 justify-center gap-2">
             <div className="relative">
               {
@@ -65,6 +72,9 @@ export default function TwoD() {
               ) : <div className="h-38 w-24 bg-gray-300 rounded-md flex items-center justify-center" />
             }
           </div>
+
+          
+          {/* user's cards */}
           <div className="relative flex flex-row justify-center">
             <div className="relative section px-12 py-4 rounded-md flex flex-col shadow-md player-cards gap-2">
               <div className="flex flex-row items-center gap-2 justify-center items-center">
@@ -91,9 +101,16 @@ export default function TwoD() {
               </div>
             </div>
           </div>
+
+
+
+          {/* widgets on left of screen */}
           <Instruction />
           { nw.render() }
           { cw.render() }
+
+
+          {/* debug action info */}
           <p className="fixed bottom-4 right-4 bg-gray-200 p-2 rounded-md">{JSON.stringify(game.action)}</p>
         </div>
     )

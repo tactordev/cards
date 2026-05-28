@@ -11,9 +11,9 @@ class NotificationWindow {
     constructor(messageList: string[][] , setMessageList: (messages: string[][] ) => void) {
         this.messageList = messageList;
         this.setMessageList = setMessageList;
-    }
+    } // notification widget (top left)
 
-    render() {
+    render() { //renders it
         return (
         <div className="absolute section shadow-sm left-4 top-104 w-72 h-72 shadow-lg bg-gray-200 rounded-md flex flex-col gap-2 justify-end p-4 overflow-y-auto">
             {this.messageList.map((message, index) => (
@@ -26,7 +26,7 @@ class NotificationWindow {
         )
     }
 
-    post(message: string, type: "info" | "warning") {
+    post(message: string, type: "info" | "warning") { // new message in widget window
         this.messageList.push([message, type]);
         this.setMessageList([...this.messageList]);
         return;
