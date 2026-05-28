@@ -133,7 +133,7 @@ export default function TwoD() { // 2d game component, 2d version of game
             <div className="absolute flex flex-col top-0 -right-62 gap-4">
               <div className="relative group flex flex-row justify-center items-center section px-3 py-2 shadow-sm rounded-md gap-2 w-60">
                 <Timer />
-                <p className="translate-y-0.5 font-semibold text-gray-800 tabular-nums">Snap time: <span className="px-3 py-1 bg-slate-400/20 rounded-md mr-2 font-mono text-sm tabular-nums">{game.snapTimer === 0 ? "expired" : game.snapTimer}</span>.</p>
+                <p className="translate-y-0.5 font-semibold text-gray-800 tabular-nums">Snap time: <span className="px-3 py-1 bg-slate-400/20 rounded-md mr-2 font-mono text-sm tabular-nums">{game.snapTimer === 0 ? "expired" : game.snapTimer.toFixed(1)}</span>.</p>
               </div>
             </div>
           </div>

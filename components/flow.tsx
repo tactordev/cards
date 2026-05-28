@@ -151,7 +151,7 @@ class Game {
             }, 5000);
             this.snapIntervalId = setInterval(() => {
                 if (this.snapTimer > 0) {
-                    this.setSnapTimer(this.snapTimer - 1);
+                    this.setSnapTimer(this.snapTimer - 0.1);
                 }
 
                 if (this.snapTimer === 0) {
@@ -178,7 +178,7 @@ class Game {
                     });
                     this.triggerNextAction();
                 }
-            }, 1000);
+            }, 100);
         } else if (this.action.type === "snap") { // snap timer finished
 
             // switch turns
