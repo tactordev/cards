@@ -84,13 +84,21 @@ export default function MainGame() {
     )
   }
 
-  const content = (game.deck.deck.length > 0 && game.deck.user.length > 0 && game.deck.opponent.length > 0) // changes content depending on game state
+  const content = (game.deck.deck.length > 0 || game.deck.user.length > 0 || game.deck.opponent.length > 0 || game.deck.user.length > 6) // changes content depending on game state
     ? gameType === 2
       ? <TwoD />
       : <ThreeD /> // 2d / 3d switch
     : (
       <div className="flex flex-col gap-8 w-full h-screen items-center justify-center">
-        <h1 className="text-2xl text-center">The deck is empty.<br />Game over.</h1>
+        <h1 className="text-2xl text-center">
+          {
+            game.deck.deck.length === 0 ? "The deck is empty. Auto-reshuffling will be implemented in the future." :
+            game.deck.user.length === 0 ? "You snapped all your cards and therefore won by default!" :
+            game.deck.opponent.length === 0 ? "Your opponent snapped all their cards and won by default!" :
+            game.deck.user.length > 6 ? "You have more than 6 cards in your hand and therefore lost by default. Try not to missnap." :
+            "The game has ended."
+          }
+          <br />Game over.</h1>
         { finalScores() }
         <a href="/" className="text-blue-500 hover:underline">Play again</a>
       </div> // endgame screen
