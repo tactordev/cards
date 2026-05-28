@@ -56,26 +56,43 @@ export default function TwoD() { // 2d game component, 2d version of game
             </div>
           </div>
 
-          {/* deck and discard pile */}
-          <div className="card-deck relative section px-12 py-4 rounded-md shadow-md flex flex-row gap-2 justify-center gap-2">
-            <div className="relative">
-              {
-                new Card(game.deck.deck[game.deck.deck.length - 1][0], game.deck.deck[game.deck.deck.length - 1][1], game, nw, cw).render("deck-card")
+          {/* table of play */}
+          <div className="relative flex flex-row justify-center">
+            {/* deck and discard pile */}
+            <div className="card-deck relative section px-12 py-4 rounded-md shadow-md flex flex-row gap-2 justify-center gap-2">
+              {/* deck */}
+              <div className="relative">
+                {
+                  new Card(game.deck.deck[game.deck.deck.length - 1][0], game.deck.deck[game.deck.deck.length - 1][1], game, nw, cw).render("deck-card")
+                }
+                <p className="absolute bottom-4 text-xs text-white left-3">{game.deck.deck.length} cards left</p>
+              </div>
+
+              {/* discard pile */}
+              { 
+                discarded.length > 0 ? (
+                  <div>
+                    {[discarded[discarded.length - 1].render("discarded-card", -2)]}
+                  </div>
+                ) : <div className="h-38 w-24 bg-gray-300 rounded-md flex items-center justify-center" />
               }
-              <p className="absolute bottom-4 text-xs text-white left-3">{game.deck.deck.length} cards left</p>
             </div>
-            { 
-              discarded.length > 0 ? (
-                <div>
-                  {[discarded[discarded.length - 1].render("discarded-card", -2)]}
-                </div>
-              ) : <div className="h-38 w-24 bg-gray-300 rounded-md flex items-center justify-center" />
-            }
+
+
+            {/* information */}
+            <div className="absolute flex flex-col top-0 -right-60 gap-4">
+              <div className="relative group flex flex-row justify-center items-center section px-3 py-2 shadow-sm rounded-md gap-2">
+                <Timer />
+                <p className="translate-y-0.5 font-semibold text-gray-800">Snap time: <span className="numerical bg-slate-400/20 px-3 py-1 rounded-md mr-2">{game.snapTimer === 0 ? "expired" : game.snapTimer}</span>.</p>
+              </div>
+            </div>
           </div>
 
           
           {/* user's cards */}
           <div className="relative flex flex-row justify-center">
+
+            {/* cards */}
             <div className="relative section px-12 py-4 rounded-md flex flex-col shadow-md player-cards gap-2">
               <div className="flex flex-row items-center gap-2 justify-center items-center">
                 <CircleUser className="w-8 h-8 text-gray-800" />
@@ -88,6 +105,8 @@ export default function TwoD() { // 2d game component, 2d version of game
                 ))}
               </div>
             </div>
+
+            {/* actions */}
             <div className="absolute flex flex-col bottom-0 -right-36 gap-4">
               <div className="relative group flex flex-row justify-center items-center hover:cursor-pointer hover:-translate-y-0.5 gap-2 section px-3 py-2 shadow-sm rounded-md transition-transform duration-200">
                 <Timer />

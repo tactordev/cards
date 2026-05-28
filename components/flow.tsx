@@ -7,7 +7,7 @@ import { FaceUpCard } from "./card";
 
 type Action = {
     agent: "player" | "opponent" | "both";
-    type: "start" | "pickup" | "discard" | "jack" | "jack-snapped" | "queen" | "queen-snapped" | "black_king" | "black_king-snapped";
+    type: "start" | "pickup" | "discard" | "snap" | "jack" | "jack-snapped" | "queen" | "queen-snapped" | "black_king" | "black_king-snapped";
     config: {
         amount: number;
         next: "player" | "opponent";
@@ -26,8 +26,12 @@ class Game {
     public setAction: (action: Action) => void;
     public discarded: FaceUpCard[];
     public setDiscarded: (discarded: FaceUpCard[]) => void;
+    public snapTimer: number;
+    public setSnapTimer: (timer: number) => void;
+    private snapTimeoutId: ReturnType<typeof setTimeout> | null;
+    private snapIntervalId: ReturnType<typeof setInterval> | null;
 
-    constructor(action: Action, setAction: (action: Action) => void, opponentKnows: {location: string, card: [string, string]}[], setOpponentKnows: (opponentKnows: {location: string, card: [string, string]}[]) => void, nw: NotificationWindow, cw: CardWindow, discarded: FaceUpCard[], setDiscarded: (discarded: FaceUpCard[]) => void) {
+    constructor(action: Action, setAction: (action: Action) => void, opponentKnows: {location: string, card: [string, string]}[], setOpponentKnows: (opponentKnows: {location: string, card: [string, string]}[]) => void, nw: NotificationWindow, cw: CardWindow, discarded: FaceUpCard[], setDiscarded: (discarded: FaceUpCard[]) => void, snapTimer: number, setSnapTimer: (timer: number) => void) {
         // attributes
         this.nw = nw;
         this.cw = cw;
@@ -42,6 +46,13 @@ class Game {
             this.discarded = newDiscarded;
             setDiscarded(newDiscarded);
         };
+        this.snapTimer = snapTimer;
+        this.setSnapTimer = (timer: number) => {
+            this.snapTimer = timer;
+            setSnapTimer(timer);
+        };
+        this.snapTimeoutId = null;
+        this.snapIntervalId = null;
     }
 
     isPlayerTurn() { // checks if it is the player's turn (obv)
@@ -96,7 +107,6 @@ class Game {
     }
 
     triggerNextAction() { // increment to the next action
-
         if (this.action.type === "start") {
             this.setAction({
                 agent: "player",
@@ -111,11 +121,11 @@ class Game {
 
         } else if (this.action.type === "pickup") { // pick up card --> discard a card
             this.setAction({
-                agent: this.action.agent,
+                agent: this.action.config.next,
                 type: "discard",
                 config: {
                     amount: 1,
-                    next: this.action.agent === "player" ? "opponent" : "player",
+                    next: this.action.config.next,
                 },
             });
             this.nw.post("Discard a card from your hand.", "info");
@@ -124,17 +134,52 @@ class Game {
 
         } else if (this.action.type === "discard") { // discard a card --> switch turns (in future: special card action, snap, then switch turns)
             this.setAction({
-                agent: this.action.agent === "player" ? "opponent" : "player",
-                type: "pickup",
+                agent: "both",
+                type: "snap",
                 config: {
-                    amount: 1,
+                    amount: -1,
                     next: this.action.agent === "player" ? "opponent" : "player",
                 },
             });
-            this.nw.post(`It is now ${this.isPlayerTurn() ? "your" : "opponent's"} turn. ${this.isPlayerTurn() ? "Pick up a card from the deck." : "Opponent is picking up a card..."}`, "info");
+
+            this.nw.post("A card has been discarded. If you have a card of the same rank, you can snap it to also discard it. You only have 5 seconds to snap!", "info");
+            this.setSnapTimer(5);
+            this.snapTimeoutId = setTimeout(() => {
+                this.setSnapTimer(0);
+            }, 5000);
+            this.snapIntervalId = setInterval(() => {
+                if (this.snapTimer > 0) {
+                    this.setSnapTimer(this.snapTimer - 1);
+                }
+
+                if (this.snapTimer === 0) {
+                    this.setSnapTimer(0);
+                    if (this.snapTimeoutId) {
+                        clearTimeout(this.snapTimeoutId);
+                        this.snapTimeoutId = null;
+                    }
+                    if (this.snapIntervalId) {
+                        clearInterval(this.snapIntervalId);
+                        this.snapIntervalId = null;
+                    }
+
+                    this.nw.post(`You can no longer snap.`, "info");
+                    this.triggerNextAction();
+                }
+            }, 1000);
+        } else if (this.action.type === "snap") { // snap timer finished
+            this.setAction({
+                agent: this.action.config.next,
+                type: "pickup",
+                config: {
+                    amount: 1,
+                    next: this.action.config.next,
+                },
+            });
+            this.nw.post(`It is now your ${this.isPlayerTurn() ? "" : "opponent's"} turn. ${this.isPlayerTurn() ? "Pick up a card from the deck." : "Opponent is picking up a card..."}`, "info");
 
             // simulates the opponent's turn
-            if (this.isOpponentTurn()) {
+            if (this.action.agent === "opponent") {
                 setTimeout(() => {
                     this.simulateOpponentTurn();
                 }, 500);

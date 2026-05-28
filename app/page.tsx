@@ -57,7 +57,8 @@ export default function MainGame() {
   const [time, setTimer] = useState<number | null>(null); // timer for card window
   const cw = new CardWindow(nw, card, setCard, time, setTimer); // card window
   const [discarded, setDiscarded] = useState<FaceUpCard[]>([]); // discarded card pile
-  const [game, setGame] = useState(() => new Game(action, setAction, opponentKnows, setOpponentKnows, nw, cw, discarded, setDiscarded)); // game
+  const [snapTimer, setSnapTimer] = useState<number>(0); // timer for snap action
+  const [game, setGame] = useState(() => new Game(action, setAction, opponentKnows, setOpponentKnows, nw, cw, discarded, setDiscarded, snapTimer, setSnapTimer)); // game
 
   function finalScores() { // final score calculator
     const userTotal = game.deck.user.map(card => card[0]).reduce((sum, rank) => {
