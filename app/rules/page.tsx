@@ -16,7 +16,7 @@ export default function Rules() {
             case "Kiki":
                 return (
                     <AnimatePresence>
-                        <motion.div key={game} initial={{opacity: 0, y: 5}} animate={{opacity: 1, y: 0}} exit={{opacity: 0, y: -5, transition: { duration: 0.25 }}} transition={{ duration: 0.5, delay: 0.25 }} className="section scrb flex flex-col mt-4 justify-start items-start shadow-sm rounded-md px-4 py-2 ml-12 max-w-198 overflow-y-scroll max-h-190 pb-8">
+                        <motion.div key={game} initial={{opacity: 0, y: 5}} animate={{opacity: 1, y: 0}} exit={{opacity: 0, y: -5, transition: { duration: 0.25 }}} transition={{ duration: 0.5, delay: 0.25 }} className="generalSection scrb flex flex-col mt-4 justify-start items-start shadow-sm rounded-md px-4 py-2 ml-12 max-w-198 overflow-y-scroll max-h-190 pb-8">
                             <h3 className="text-gray-700 font-semibold text-md mt-2">About</h3>
                             <p className="text-gray-500 text-sm">
                                 Kiki is a game about memory. Each player is given a set of 4 playing cards and you check 2 of them. You can learn what the other cards are through the mechanics of the game. The objective is to run out of cards or to call endgame and have the lowest total card value on the table.
@@ -82,7 +82,7 @@ export default function Rules() {
             case "TNP":
                 return (
                     <AnimatePresence>
-                        <motion.div key={game} initial={{opacity: 0, y: 5}} animate={{opacity: 1, y: 0}} exit={{opacity: 0, y: -5, transition: { duration: 0.25 }}} transition={{ duration: 0.5, delay: 0.25 }} className="section flex flex-row mt-4 justify-start items-start shadow-sm rounded-md px-4 py-2 ml-12">
+                        <motion.div key={game} initial={{opacity: 0, y: 5}} animate={{opacity: 1, y: 0}} exit={{opacity: 0, y: -5, transition: { duration: 0.25 }}} transition={{ duration: 0.5, delay: 0.25 }} className="generalSection flex flex-row mt-4 justify-start items-start shadow-sm rounded-md px-4 py-2 ml-12">
                             <CircleSlash className="w-6 h-6 text-gray-500 mr-2" />
                             <p className="text-gray-500">This game is not finished yet. Check back for the rules at a later date.</p>
                         </motion.div>
@@ -92,7 +92,7 @@ export default function Rules() {
             default:
                 return (
                     <AnimatePresence>
-                        <motion.div key="default" initial={{opacity: 0, y: 5}} animate={{opacity: 1, y: 0}} exit={{opacity: 0, y: -5}} transition={{ duration: 0.25 }} className="section flex flex-row mt-4 justify-start items-start shadow-sm rounded-md px-4 py-2 ml-12">
+                        <motion.div key="default" initial={{opacity: 0, y: 5}} animate={{opacity: 1, y: 0}} exit={{opacity: 0, y: -5}} transition={{ duration: 0.25 }} className="generalSection flex flex-row mt-4 justify-start items-start shadow-sm rounded-md px-4 py-2 ml-12">
                             <CircleSlash className="w-6 h-6 text-gray-500 mr-2" />
                             <p className="text-gray-500 translate-y-0.25">Select a game to view its rules.</p>
                         </motion.div>
@@ -102,14 +102,14 @@ export default function Rules() {
     }
 
     return (
-        <main className="flex flex-col w-screen h-screen items-start pt-8 overflow-x-hidden overflow-y-hidden">
-            <h1 className="section text-2xl font-bold text-gray-800 mb-2 ml-12 px-4 py-2 rounded-md shadow-sm">Rules</h1>
+        <main className="flex flex-col w-screen h-screen items-start pt-8 overflow-x-hidden overflow-y-hidden bg-linear-to-br from-[#D5DEE7] to-[#E2E7ED] text-gray-800">
+            <h1 className="generalSection text-2xl font-bold text-gray-800 mb-2 ml-12 px-4 py-2 rounded-md shadow-sm">Rules</h1>
             <div className="flex flex-row gap-2">
-                <div className={`section relative flex flex-row items-center justify-center shadow-sm rounded-md px-3 py-1 ml-12 group transition-colors duration-200`} onClick={() => setGame("Kiki")}>
+                <div className={`generalSection relative flex flex-row items-center justify-center shadow-sm rounded-md px-3 py-1 ml-12 group transition-colors duration-200`} onClick={() => setGame("Kiki")}>
                     <p>Kiki/Cabo</p>
                     <div className={`absolute w-full h-full rounded-md ${game === "Kiki" ? "tintedBlue" : ""} opacity-20 group-hover:tintedBlue group-hover:cursor-pointer transition-opacity duration-200`} />
                 </div>
-                <div className={`section relative flex flex-row items-center justify-center shadow-sm rounded-md px-3 py-1 hover:cursor-pointer group transition-colors duration-200`} onClick={() => setGame("TNP")}>
+                <div className={`generalSection relative flex flex-row items-center justify-center shadow-sm rounded-md px-3 py-1 hover:cursor-pointer group transition-colors duration-200`} onClick={() => setGame("TNP")}>
                     <p>Tactor's Nifty Pets</p>
                     <div className={`absolute w-full h-full rounded-md ${game === "TNP" ? "tintedBlue" : ""} opacity-20 group-hover:tintedBlue group-hover:cursor-pointer transition-opacity duration-200`} />
                 </div>
