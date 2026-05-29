@@ -49,7 +49,14 @@ export default function TwoD() { // 2d game component, 2d version of game
 
     // special buttons
     function endgame(e: React.MouseEvent<HTMLParagraphElement>) {
-      // nothing yet
+      if (!game) return;
+      if (game.action.agent !== "player" && (game.action.type !== "snap" || game.action.config.next !== "opponent")) {
+        nw.post("You can only call endgame during your turn.", "warning");
+        return;
+      }
+
+      game.endGame = "player";
+      nw.post("You have called endgame. Everyone will have one more turn then the game will end.", "info");
       return;
     }
 

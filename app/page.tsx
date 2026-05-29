@@ -109,7 +109,7 @@ export default function MainGame() {
     )
   }
 
-  const content = (game.deck.deck.length > 0 && game.deck.user.length > 0 && game.deck.opponent.length > 0 && game.deck.user.length <= 6) // changes content depending on game state
+  const content = (game.deck.deck.length > 0 && game.deck.user.length > 0 && game.deck.opponent.length > 0 && game.deck.user.length <= 6 && game.endGame !== "ended") // changes content depending on game state
     ? gameType === 2
       ? <TwoD />
       : <ThreeD /> // 2d / 3d switch

@@ -30,6 +30,7 @@ class Game {
     public setSnapTimer: (timer: number) => void;
     public userCards: Card[];
     public forceRerender: () => void;
+    public endGame: string | null = null;
     private snapTimeoutId: ReturnType<typeof setTimeout> | null;
     private snapIntervalId: ReturnType<typeof setInterval> | null;
 
@@ -69,6 +70,7 @@ class Game {
         this.snapTimeoutId = null;
         this.snapIntervalId = null;
         this.userCards = [];
+        this.endGame = null;
     }
     
 
@@ -252,6 +254,11 @@ class Game {
                     next: this.action.agent === "player" ? "opponent" : "player",
                 },
             });
+        }
+
+        if (this.endGame === this.action.agent && this.action.type === "pickup") {
+            this.endGame = "ended";
+            return;
         }
 
     }
