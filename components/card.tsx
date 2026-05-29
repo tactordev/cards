@@ -68,8 +68,25 @@ class Card {
         
         const curAction = this.game.getActionType();
 
-        if (event.currentTarget.classList[0] === "discarded-card") { // NOTE: this is unfinished, later on you'll be able to pick up from the discard pile
-            return;
+        if (event.currentTarget.classList[0] === "discarded-card") { // picking up a card from the discard pile
+            if (curAction !== "pickup") {
+                this.nw.post("You cannot pick up a card when it is not your turn.", "warning");
+                return;
+            }
+            if (this.game.discarded[this.game.discarded.length - 1].rank === "K" && (this.game.discarded[this.game.discarded.length - 1].suit === "s" || this.game.discarded[this.game.discarded.length - 1].suit === "c")) {
+                this.nw.post("You cannot pick up a black king.", "warning");
+                return;
+            }
+
+            if (this.cw.presence()) {
+                this.nw.post("You are already viewing a card. Please discard this card or wait for the timer to elapse before selecting a new one.", "warning");
+            }
+
+            const newCardObj = this.game.discarded.pop()!;
+            const pickupInitialPos = motionFromElementToSelector(event.currentTarget, ".cw-card-slot");
+            const res = this.cw.show(new FaceUpCard(newCardObj.rank, newCardObj.suit, this.game, this.nw, this.cw, pickupInitialPos));
+            this.nw.post("You picked up the top card from the discard pile. View it in the card viewer. Select a card to discard.", "info");
+            this.game.triggerNextAction();
         } else if (event.currentTarget.classList[0] === "deck-card") { // this is the deck in the middle of the screen
             if (curAction !== "pickup") {
                 this.nw.post("You cannot pick up a card when it is not your turn.", "warning");
