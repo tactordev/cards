@@ -27,9 +27,9 @@ function Instruction() { // instruction widget at top left of screen
   return (
     <div className="absolute top-18 left-4 section w-72 rounded-md shadow-md flex items-center justify-center px-4 py-2 bg-gray-200">
       {game.action.agent === "player" || game.action.agent === "both" ? (
-        <p className="text-center text-gray-700 truncate">{action.type === "start" ? "Look at two of your cards." : action.type === "pickup" ? "Pick up a card from the deck." : action.type === "discard" ? "Discard a card from your hand." : action.type === "snap" ? `Snap a card if you have one.` : `Use the ${action.type} card.`}</p>
+        <p className="text-center text-white/80 truncate">{action.type === "start" ? "Look at two of your cards." : action.type === "pickup" ? "Pick up a card from the deck." : action.type === "discard" ? "Discard a card from your hand." : action.type === "snap" ? `Snap a card if you have one.` : `Use the ${action.type} card.`}</p>
       ) : (
-        <p className="text-center text-gray-700 truncate">Waiting for opponent...</p>
+        <p className="text-center text-white/80 truncate">Waiting for opponent...</p>
       )}
     </div>
   )
@@ -119,8 +119,8 @@ export default function TwoD() { // 2d game component, 2d version of game
           {/* opponent information */}
           <div className="relative section flex flex-col opponent-cards gap-2 px-12 py-4 rounded-md shadow-md">
             <div className="flex flex-row items-center gap-2 justify-center items-center">
-              <CircleUser className="w-8 h-8 text-gray-800" />
-              <p className="text-lg font-bold text-gray-800">Automated Opponent</p>
+              <CircleUser className="w-8 h-8 text-white/60" />
+              <p className="text-lg font-bold text-white/80">Automated Opponent</p>
             </div>
             <motion.div className="flex flex-row relative gap-2">
               { 
@@ -162,7 +162,7 @@ export default function TwoD() { // 2d game component, 2d version of game
                       >
                         {[discarded[discarded.length - 1].render("discarded-card", -2)]}
                       </motion.div>
-                    ) : <div className="h-38 w-24 bg-gray-300 rounded-md flex items-center justify-center" />
+                    ) : <div className="h-38 w-24 bg-white/20 rounded-md flex items-center justify-center" />
                   }
                 </AnimatePresence>
               </div>
@@ -172,12 +172,12 @@ export default function TwoD() { // 2d game component, 2d version of game
             {/* information */}
             <div className="absolute flex flex-col top-0 -right-68 gap-4">
               <div className="relative group flex flex-row justify-center items-center section px-3 py-2 shadow-sm rounded-md gap-2 w-60">
-                <Timer />
-                <p className="translate-y-0.5 font-semibold text-gray-800 tabular-nums">Snap time: <span className="px-3 py-1 bg-slate-400/20 rounded-md mr-2 font-mono text-sm tabular-nums">{game.snapTimer === 0 ? "expired" : game.snapTimer.toFixed(1)}</span>.</p>
+                <Timer className="w-6 h-6 text-white/60" />
+                <p className="translate-y-0.5 font-semibold text-white/80 tabular-nums">Snap time: <span className="px-3 py-1 bg-slate-400/20 rounded-md mr-2 font-mono text-sm tabular-nums">{game.snapTimer === 0 ? "expired" : game.snapTimer.toFixed(1)}</span>.</p>
               </div>
               <div className="relative group flex flex-row justify-center items-center section px-3 py-2 shadow-sm rounded-md gap-2 w-64">
-                <Zap />
-                <p className="translate-y-0.5 font-semibold text-gray-800">Special card: <span className="px-3 py-1 bg-slate-400/20 rounded-md mr-2 font-mono text-sm">{game.specialCardTimer === 0 ? "expired" : game.specialCardTimer === "executing" ? "executing" : game.specialCardTimer.toFixed(1)}</span>.</p>
+                <Zap className="w-6 h-6 text-white/60" />
+                <p className="translate-y-0.5 font-semibold text-white/80">Special card: <span className="px-3 py-1 bg-slate-400/20 rounded-md mr-2 font-mono text-sm">{game.specialCardTimer === 0 ? "expired" : game.specialCardTimer === "executing" ? "executing" : game.specialCardTimer.toFixed(1)}</span>.</p>
               </div>
             </div>
           </div>
@@ -189,8 +189,8 @@ export default function TwoD() { // 2d game component, 2d version of game
             {/* cards */}
             <div className="relative section px-12 py-4 rounded-md flex flex-col shadow-md player-cards gap-2">
               <div className="flex flex-row items-center gap-2 justify-center items-center">
-                <CircleUser className="w-8 h-8 text-gray-800" />
-                <p className="text-lg font-bold text-gray-800">Your Cards</p>
+                <CircleUser className="w-8 h-8 text-white/60" />
+                <p className="text-lg font-bold text-white/80">Your Cards</p>
               </div>
               <motion.div
                 className="flex flex-row relative items-center gap-2 justify-center"
@@ -214,12 +214,12 @@ export default function TwoD() { // 2d game component, 2d version of game
             <div className="absolute flex flex-col bottom-0 -right-36 gap-4">
               <div className="relative group flex flex-row justify-center items-center hover:cursor-pointer hover:-translate-y-0.5 gap-2 section px-3 py-2 shadow-sm rounded-md transition-transform duration-200">
                 <Timer />
-                <p className="translate-y-0.5 font-semibold text-gray-800">ENDGAME</p>
+                <p className="translate-y-0.5 font-semibold text-white/80">ENDGAME</p>
                 <div className="absolute w-full h-full bg-red-800 rounded-md tintedRed opacity-20 group-hover:opacity-25 transition-opacity duration-200" onClick={endgame} />
               </div>
               <div className="relative group flex flex-row justify-center items-center hover:cursor-pointer hover:-translate-y-0.5 gap-2 section px-3 py-2 shadow-sm rounded-md transition-transform duration-200">
                 <Zap />
-                <p className="translate-y-0.5 font-semibold text-gray-800">SNAP</p>
+                <p className="translate-y-0.5 font-semibold text-white/80">SNAP</p>
                 <div className="absolute w-full h-full bg-blue-800 rounded-md tintedBlue opacity-20 group-hover:opacity-25 transition-opacity duration-200" onClick={snap} />
               </div>
             </div>
@@ -234,7 +234,7 @@ export default function TwoD() { // 2d game component, 2d version of game
 
 
           {/* debug action info */}
-          <p className="fixed bottom-4 right-4 bg-gray-200 p-2 rounded-md">{JSON.stringify(game.action)}</p>
+          <p className="fixed bottom-4 right-4 bg-white/20 p-2 rounded-md text-white/80">{JSON.stringify(game.action)}</p>
         </div>
     )
 }

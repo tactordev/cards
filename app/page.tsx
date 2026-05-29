@@ -21,11 +21,11 @@ function GameTypeSelector({ type, setType }: { type: 2 | 3, setType: (type: 2 | 
   const [warning, showWarning] = useState<boolean>(false);
 
   return (
-    <div className="absolute section top-4 left-4 z-10 flex flex-row bg-gray-200 p-2 rounded-md gap-2 shadow-sm items-center justify-center w-24 h-12">
-      <div className={`flex flex-row px-2 py-1 rounded-md hover:cursor-pointer transition-colors duration-200 hover:bg-gray-300 ${type === 2 ? "bg-slate-400/40" : ""}`} onClick={() => setType(2)}>
+    <div className="absolute section top-4 left-4 z-10 flex flex-row p-2 rounded-md gap-2 shadow-sm items-center justify-center w-24 h-12">
+      <div className={`flex flex-row px-2 py-1 rounded-md hover:cursor-pointer transition-colors duration-200 hover:bg-white/30 ${type === 2 ? "bg-slate-400/40" : ""}`} onClick={() => setType(2)}>
         <p>2D</p>
       </div>
-      <div className={`flex flex-row px-2 py-1 rounded-md hover:cursor-pointer transition-colors duration-200 hover:bg-gray-300 ${type === 3 ? "bg-slate-400/40" : ""}`} onClick={() => { showWarning(true); }}  >
+      <div className={`flex flex-row px-2 py-1 rounded-md hover:cursor-pointer transition-colors duration-200 hover:bg-white/30 ${type === 3 ? "bg-slate-400/40" : ""}`} onClick={() => { showWarning(true); }}  >
         <p>3D</p>
       </div>
       <AnimatePresence>{ warning && <ThreeDGameWarning setType={setType} setWarning={showWarning} /> }</AnimatePresence>
@@ -37,14 +37,14 @@ function ThreeDGameWarning({ setType, setWarning }: { setType: (type: 2 | 3) => 
 
   return (
     <motion.div className="fixed w-screen h-screen bg-gray-800/20 top-0 left-0 flex flex-col items-center justify-center z-20" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}>
-      <div className="section px-6 py-4 rounded-md shadow-sm flex flex-col gap-4 justify-center items-center">
+      <div className="section px-6 py-4 rounded-md shadow-sm flex flex-col gap-4 justify-center items-center backdrop-blur-sm">
         <TriangleAlert className="w-8 h-8 text-yellow-500" />
         <p className="text-sm">The 3D mode is not finished and is not ready to be reviewed.<br/>You can still go experiment anyway. I&apos;d love some feedback!</p>
         <div className="flex flex-row gap-2 justify-center items-center">
-          <p className="px-4 text-gray-500 text-base hover:underline transition-all duration-200 hover:cursor-pointer translate-y-0.25" onClick={() => { setType(2); setWarning(false); }}>
+          <p className="px-4 text-white/80 text-base hover:underline transition-all duration-200 hover:cursor-pointer translate-y-0.25" onClick={() => { setType(2); setWarning(false); }}>
             Back
           </p>
-          <p className="px-4 py-1 hover:cursor-pointer opacity-80 transition-all duration-200 hover:opacity-100 rounded-md shadow-sm bg-gray-400/40" onClick={() => { setType(3); setWarning(false); }}>
+          <p className="px-4 py-1 hover:cursor-pointer opacity-80 transition-all duration-200 hover:opacity-100 rounded-md shadow-sm bg-gray-300/40" onClick={() => { setType(3); setWarning(false); }}>
             Continue
           </p>
         </div>
@@ -57,13 +57,13 @@ function Helps() { // helping buttons below the widgets on left of screen
   return (
     <div className="absolute top-178 left-4 flex flex-row gap-2">
       <div className="section px-3 group py-2 shadow-sm rounded-md hover:cursor-pointer hover:-translate-y-0.5 transition-transform duration-200" title="Rules" onClick={() => window.open(`${window.location.origin}/rules`, "_blank")}>
-        <Info className="w-6 h-6 text-gray-500 inline-block group-hover:text-blue-500 transition-colors duration-200" />
+        <Info className="w-6 h-6 text-white/60 group-hover:text-white inline-block group-hover:text-blue-500 transition-colors duration-200" />
       </div>
       <div className="section px-3 group py-2 shadow-sm rounded-md hover:cursor-pointer hover:-translate-y-0.5 transition-transform duration-200" title="Buy me a coffee" onClick={() => window.open("https://www.ko-fi.com/tactor", "_blank")}>
-        <Coffee className="w-6 h-6 text-gray-500 inline-block group-hover:text-yellow-500 transition-colors duration-200" />
+        <Coffee className="w-6 h-6 text-white/60 group-hover:text-yellow-500 transition-colors duration-200" />
       </div>
       <div className="section px-3 group py-2 shadow-sm rounded-md hover:cursor-pointer hover:-translate-y-0.5 transition-transform duration-200" title="Credits" onClick={() => window.open(`${window.location.origin}/credits`, "_blank")}>
-        <CircleStar className="w-6 h-6 text-gray-500 inline-block group-hover:text-purple-500 transition-colors duration-200" />
+        <CircleStar className="w-6 h-6 text-white/60 inline-block group-hover:text-purple-400 transition-colors duration-200" />
       </div>
     </div>
   )

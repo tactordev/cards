@@ -355,7 +355,7 @@ class Card {
                 layout
                 layoutId={`${this.rank}${this.suit}`} 
                 transition={{ duration: 0.35, ease: "easeInOut" }}
-                className={`${type} ${className} hover:cursor-pointer border-3 border-transparent hover:border-yellow-500 border-inset transition-colors duration-200 h-38 w-24 bg-gray-300 rounded-md flex items-center justify-center`}
+                className={`${type} ${className} hover:cursor-pointer border-3 border-transparent hover:border-yellow-500 border-inset transition-colors duration-200 h-38 w-24 bg-white/40 rounded-md flex items-center justify-center`}
                 onClick={(event) => this.handler(event)}
                 key={`${this.rank}${this.suit}`}
             >

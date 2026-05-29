@@ -41,7 +41,7 @@ class CardWindow {
         return (
             <div className="absolute section shadow-sm left-4 w-72 h-72 top-30 rounded-md shadow-md flex flex-col bg-gray-200 items-center pt-4">
                 <div className="relative flex flex-col w-full h-full items-center justify-center">
-                    <p className="absolute left-4 top-0 small-caps text-lg font-semibold text-gray-700">View Cards</p>
+                    <p className="absolute left-4 top-0 small-caps text-lg font-semibold text-white/80">View Cards</p>
                         <div className="cw-card-slot h-38 w-24 flex items-center justify-center" key="cw-slot">
                         
                         {this.card ? (
@@ -69,8 +69,8 @@ class CardWindow {
                                     exit={{ opacity: 0, transition: { duration: 0.5, ease: "easeInOut", delay: -1 } }}
                                     key="empty-cw"
                                 >
-                                    <CircleSlash className="w-16 h-16 text-gray-400" />
-                                    <p className="text-gray-500 mt-2">No card selected.</p>
+                                    <CircleSlash className="w-16 h-16 text-white/60" />
+                                    <p className="text-white/80 mt-2">No card selected.</p>
                                 </motion.div>
                             </AnimatePresence>
                         )}
@@ -79,7 +79,7 @@ class CardWindow {
                             this.time ? (
                             <AnimatePresence>
                                 <motion.p
-                                    className="text-xs text-gray-500 mt-2"
+                                    className="text-xs text-white/80 mt-2"
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     exit={{ opacity: 0 }}
