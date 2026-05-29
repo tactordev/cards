@@ -171,12 +171,12 @@ export default function TwoD() { // 2d game component, 2d version of game
 
 
             {/* information */}
-            <div className="absolute flex flex-col top-0 -right-68 gap-4">
+            <div className="absolute flex flex-col top-0 -right-70 gap-4">
               <div className="relative group flex flex-row justify-center items-center section px-3 py-2 shadow-sm rounded-md gap-2 w-60">
                 <Timer className="w-6 h-6 text-white/60" />
                 <p className="translate-y-0.5 font-semibold text-white/80 tabular-nums">Snap time: <span className="px-3 py-1 bg-slate-400/20 rounded-md mr-2 font-mono text-sm tabular-nums">{game.snapTimer === 0 ? "expired" : game.snapTimer.toFixed(1)}</span>.</p>
               </div>
-              <div className="relative group flex flex-row justify-center items-center section px-3 py-2 shadow-sm rounded-md gap-2 w-64">
+              <div className="relative group flex flex-row justify-center items-center section px-3 py-2 shadow-sm rounded-md gap-2 w-66">
                 <Zap className="w-6 h-6 text-white/60" />
                 <p className="translate-y-0.5 font-semibold text-white/80">Special card: <span className="px-3 py-1 bg-slate-400/20 rounded-md mr-2 font-mono text-sm">{game.specialCardTimer === 0 ? "expired" : game.specialCardTimer === "executing" ? "executing" : game.specialCardTimer.toFixed(1)}</span>.</p>
               </div>

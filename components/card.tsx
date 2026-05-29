@@ -28,6 +28,7 @@ function motionFromElementToSelector(source: Element, targetSelector: string | E
     return [sourceCenter.x - targetCenter.x, sourceCenter.y - targetCenter.y];
 }
 
+
 class Card {
 
     // attribute declarations

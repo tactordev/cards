@@ -3,7 +3,7 @@ import { useState } from "react";
 import { NotificationWindow } from "@/components/nw";
 import { Deck } from "@/components/deck";
 import { CardWindow } from "@/components/cw";
-import { Card, FaceUpCard } from "./card";
+import { Card, FaceUpCard, motionFromElementToSelector } from "./card";
 
 type Action = {
     agent: "player" | "opponent" | "both";
@@ -142,6 +142,39 @@ class Game {
         this.setDiscarded(newDiscarded);
         const cardPos = this.deck.opponent.indexOf(cardToDiscard);
         this.deck.opponent.splice(cardPos, 1, newCard);
+
+
+        if (["J", "Q", "K"].includes(cardToDiscard[0])) {
+            if (cardToDiscard[0] === "K" && (cardToDiscard[1] === "D" || cardToDiscard[1] === "H")) {
+                this.triggerNextAction();
+                this.triggerNextAction();
+                return;
+            }
+            // randomly do the action
+            if (cardToDiscard[0] === "J") {
+                const cardToView = this.deck.opponent[Math.floor(Math.random() * this.deck.opponent.length)];
+            } else if (cardToDiscard[0] === "Q") {
+                const cardToView = this.deck.user[Math.floor(Math.random() * this.deck.user.length)];
+            } else if (cardToDiscard[0] === "K") {
+                const opponentCardPos = Math.floor(Math.random() * this.deck.opponent.length);
+                const playerCardPos = Math.floor(Math.random() * this.deck.user.length);
+                const opponentCardEl = document.querySelector(`.opponent-cards .card:nth-child(${opponentCardPos + 1})`);
+                const playerCardEl = document.querySelector(`.player-cards .card:nth-child(${playerCardPos + 1})`);
+                if (!opponentCardEl || !playerCardEl) {
+                    this.triggerNextAction();
+                    this.triggerNextAction();
+                    return;
+                }
+
+                const initialPos = motionFromElementToSelector(opponentCardEl, playerCardEl);
+                const playerInitialPos = motionFromElementToSelector(playerCardEl, opponentCardEl);
+                const temp = this.deck.opponent[opponentCardPos];
+                this.deck.user[playerCardPos] = this.deck.opponent[opponentCardPos];
+                this.deck.opponent[opponentCardPos] = temp;
+            }
+                
+
+        }
         this.triggerNextAction();
         this.triggerNextAction();
     }
@@ -261,8 +294,6 @@ class Game {
             }
 
         
-
-        // ----#### THESE FEATURES HAVE NOT BEEN MADE YET ####---- \\
         } else if (this.action.type === "jack" || this.action.type === "queen" || this.action.type === "black_king") { // special cards
             this.setSpecialCardTimer(10);
             this.specialCardTimeoutId = setTimeout(() => {
@@ -332,16 +363,6 @@ class Game {
                     }
                 }
             }, 100);
-
-        } else if (this.action.type === "jack-snapped" || this.action.type === "queen-snapped" || this.action.type === "black_king-snapped") { // special cards but if they were snapped and not discarded
-            this.setAction({
-                agent: this.action.agent === "player" ? "opponent" : "player",
-                type: "pickup",
-                config: {
-                    amount: 1,
-                    next: this.action.agent === "player" ? "opponent" : "player",
-                },
-            });
         }
 
         if (this.endGame === this.action.agent && this.action.type === "pickup") {
