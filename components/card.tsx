@@ -1,7 +1,7 @@
 import { Game } from "@/components/flow";
 import { NotificationWindow } from "@/components/nw";
 import { CardWindow } from "@/components/cw";
-import { AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 const suits: { [key: string]: string } = {
     h: "Hearts",
@@ -18,8 +18,8 @@ function getElementCenter(el: Element) {
     };
 }
 
-function motionFromElementToSelector(source: Element, targetSelector: string): [number, number] | undefined {
-    const target = document.querySelector(targetSelector);
+function motionFromElementToSelector(source: Element, targetSelector: string | Element): [number, number] | undefined {
+    const target = typeof targetSelector === "string" ? document.querySelector(targetSelector) : targetSelector;
     if (!target) return undefined;
 
     const sourceCenter = getElementCenter(source);
@@ -36,6 +36,7 @@ class Card {
     public game: Game; 
     public viewing: boolean = false;
     public snapSelected: boolean = false;
+    public swapSelected: boolean = false;
     public initialPos?: [number, number];
     public lastRect?: DOMRect;
     private nw: NotificationWindow;
@@ -54,6 +55,7 @@ class Card {
         this.snapSelected = false;
         this.initialPos = initialPos;
         this.lastRect = undefined;
+        this.swapSelected = false;
     }
 
     handler(event: React.MouseEvent<HTMLDivElement>) { // handles clicking of cards (in hand, deck and cw)
@@ -126,11 +128,69 @@ class Card {
 
 
             } else if (curAction === "jack") {
-                // jack logic
-                // unfinished, later on this will allow the player to view on of their own cards, similar to how they can view one of their own at the start
+                if (this.cw.presence()) {
+                    this.nw.post("You are already viewing a card. Please discard this card or wait for the timer to elapse before using your Jack ability.", "warning");
+                    return;
+                }
+
+                const initialPos = motionFromElementToSelector(event.currentTarget, ".cw-card-slot");
+                const imel = event.currentTarget.children[0] as HTMLImageElement;
+                imel.classList.add("invisible");
+                const res = this.cw.show(new FaceUpCard(this.rank, this.suit, this.game, this.nw, this.cw, initialPos));
+                this.cw.timer(5);
+                this.nw.post("You played a Jack! View one of your cards for 5 seconds.", "info");
+                this.game.setSpecialCardTimer("executing");
+                setTimeout(() => {
+                    this.game.setSpecialCardTimer(0);
+                    imel.classList.remove("invisible");
+                }, 5000);
+
+            } else if (curAction === "black_king") {
+                if (this.cw.presence()) {
+                    this.nw.post("You are already viewing a card. Please discard this card or wait for the timer to elapse before using your King ability.", "warning");
+                    return;
+                }
+
+                for (const card of this.game.userCards) {
+                    if (card.swapSelected) {
+                        card.swapSelected = false;
+                    }
+                }
+
+                let opponentCardSelected: Card | null = null;
+                for (const card of this.game.opponentCards) {
+                    if (card.swapSelected) {
+                        opponentCardSelected = card;
+                    }
+                }
+
+                this.swapSelected = true;
+                const imel = event.currentTarget.children[0] as HTMLImageElement;
+                event.currentTarget.classList.add("border-purple-500");
+                event.currentTarget.classList.remove("border-transparent");
+
+                if (!opponentCardSelected) {
+                    this.nw.post("You have selected this card for swapping. Please select one of your opponent's cards to swap it with. If you wish to deselect this card, simply click on another card from your hand.", "info");
+                } else {
+                    const ownCardPos = this.game.deck.user.indexOf(`${this.rank}${this.suit}`);
+                    const opponentCardPos = this.game.deck.opponent.indexOf(`${opponentCardSelected.rank}${opponentCardSelected.suit}`);
+                    const initialPos = motionFromElementToSelector(event.currentTarget, opponentCardSelected.lastRect ? `.opponent-card:nth-child(${this.game.opponentCards.indexOf(opponentCardSelected) + 1})` : ".deck-card");
+                    const ownInitialPos = motionFromElementToSelector(event.currentTarget, `.player-card:nth-child(${this.game.userCards.indexOf(this) + 1})`);
+                    const temp = this.game.deck.user[ownCardPos];
+                    this.game.deck.user[ownCardPos] = this.game.deck.opponent[opponentCardPos];
+                    this.game.deck.opponent[opponentCardPos] = temp;
+                    this.nw.post(`You swapped your card at position ${ownCardPos} from the left with your opponent's card at position ${opponentCardPos} from the left.`, "info");
+                    event.currentTarget.classList.remove("border-purple-500");
+                    event.currentTarget.classList.add("border-transparent");
+
+                    const opponentCardElement = document.querySelector(`.opponent-card:nth-child(${this.game.opponentCards.indexOf(opponentCardSelected) + 1})`) as HTMLElement;
+                    opponentCardElement.classList.remove("border-purple-500");
+                    opponentCardElement.classList.add("border-transparent");
+                }
 
 
-            } else if (curAction === "start") {
+            
+            }   else if (curAction === "start") {
                 if (event.currentTarget.classList.contains("start-checked")) { // if they already checked this card for the start. makes sure they look at 2 unique cards
                     this.nw.post("You have already checked this card. Check a different card.", "warning");
                     return;
@@ -202,12 +262,64 @@ class Card {
 
         } else { // opponent cards
             if (curAction === "queen") {
-                // queen logic
-                // not finished yet, but it allows the player to look at one of their opponent cards
+                if (this.cw.presence()) {
+                    this.nw.post("You are already viewing a card. Please discard this card or wait for the timer to elapse before using your Queen ability.", "warning");
+                    return;
+                }
+
+                const initialPos = motionFromElementToSelector(event.currentTarget, ".cw-card-slot");
+                const imel = event.currentTarget.children[0] as HTMLImageElement;
+                imel.classList.add("invisible");
+                const res = this.cw.show(new FaceUpCard(this.rank, this.suit, this.game, this.nw, this.cw, initialPos));
+                this.cw.timer(5);
+                this.nw.post("You played a Queen! View one of your opponent's cards for 5 seconds.", "info");
+                this.game.setSpecialCardTimer("executing");
+                setTimeout(() => {
+                    this.game.setSpecialCardTimer(0);
+                    imel.classList.remove("invisible");
+                }, 5000);
+
+
 
             } else if (curAction === "black_king") {
-                // black king logic
-                // unfinished: allows the user to switch two cards on the table (swap one of theirs with someone else's)
+                for (const card of this.game.opponentCards) {
+                    if (card.swapSelected) {
+                        card.swapSelected = false;
+                    }
+                }
+
+                let ownCardSelected: Card | null = null;
+                for (const card of this.game.userCards) {
+                    if (card.swapSelected) {
+                        ownCardSelected = card;
+                    }
+                }
+
+                this.swapSelected = true;
+                event.currentTarget.classList.add("border-purple-500");
+                event.currentTarget.classList.remove("border-transparent");
+                if (!ownCardSelected) {
+                    this.nw.post("You have selected this opponent card for swapping. Please select one of your own cards to swap it with. If you wish to deselect this card, simply click on another card from your opponent's hand.", "info");
+                } else {
+                    const ownCardPos = this.game.deck.user.indexOf(`${ownCardSelected.rank}${ownCardSelected.suit}`);
+                    const opponentCardPos = this.game.deck.opponent.indexOf(`${this.rank}${this.suit}`);
+                    const temp = this.game.deck.user[ownCardPos];
+                    this.game.deck.user[ownCardPos] = this.game.deck.opponent[opponentCardPos];
+                    this.game.deck.opponent[opponentCardPos] = temp;
+                    this.nw.post(`You swapped your card at position ${ownCardPos} from the left with your opponent's card at position ${opponentCardPos} from the left.`, "info");
+                    event.currentTarget.classList.remove("border-purple-500");
+                    event.currentTarget.classList.add("border-transparent");
+
+                    const allUserCards = document.querySelectorAll(`.player-card`)
+                    const ownCardElement = allUserCards[this.game.userCards.indexOf(ownCardSelected)] as HTMLElement;
+                    const toOpponent = motionFromElementToSelector(ownCardElement, event.currentTarget);
+                    const toUser = motionFromElementToSelector(event.currentTarget, ownCardElement);
+                    ownCardElement.classList.remove("border-purple-500");
+                    ownCardElement.classList.add("border-transparent");
+                }
+
+
+
 
 
             } else { // if invalid action
@@ -220,14 +332,18 @@ class Card {
     }
 
 
-    render(type: string, index?: number) { // render card onto screen
-        if (type === "player-card") {
-            this.game.userCards.push(this);
-        }
+    render(type: string, index?: number, className: string = "") { // render card onto screen
         return (
-            <div className={`${type} hover:cursor-pointer border-3 border-transparent hover:border-yellow-500 border-inset transition-colors duration-200 h-38 w-24 bg-gray-300 rounded-md flex items-center justify-center`} onClick={(event) => this.handler(event)} key={index}>
+            <motion.div
+                layout
+                layoutId={`${this.rank}${this.suit}`} 
+                transition={{ duration: 0.35, ease: "easeInOut" }}
+                className={`${type} ${className} hover:cursor-pointer border-3 border-transparent hover:border-yellow-500 border-inset transition-colors duration-200 h-38 w-24 bg-gray-300 rounded-md flex items-center justify-center`}
+                onClick={(event) => this.handler(event)}
+                key={`${this.rank}${this.suit}`}
+            >
                 <img src="/models/cards/back.png" alt="card mockup" className={`h-36 w-24`} />
-            </div>
+            </motion.div>
         )
     }
 }
@@ -243,9 +359,16 @@ class FaceUpCard extends Card { // card but instead of seeing my marvelous card 
 
     render(type: string, index?: number) { // render face up onto screen from /public/models/cards
         return (
-            <div className={`${type} face-up-card`} onClick={(event) => this.handler(event)} key={index}>
+            <motion.div
+                layout
+                layoutId={`${this.rank}${this.suit}`}
+                transition={{ duration: 0.35, ease: "easeInOut" }}
+                className={`${type} face-up-card`}
+                onClick={(event) => this.handler(event)}
+                key={`${this.rank}${this.suit}`}
+            >
                 <img src={`/models/cards/${this.rank}_of_${suits[this.suit].toLowerCase()}.png`} alt="card mockup" className="h-36 w-24 shadow-sm opacity-80 mb-2" />
-            </div>
+            </motion.div>
         )
     }
 

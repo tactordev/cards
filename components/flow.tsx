@@ -28,9 +28,14 @@ class Game {
     public setDiscarded: (discarded: FaceUpCard[]) => void;
     public snapTimer: number;
     public setSnapTimer: (timer: number) => void;
+    public specialCardTimer: number | "executing";
+    public setSpecialCardTimer: (timer: number | "executing") => void;
+    public opponentCards: Card[];
     public userCards: Card[];
     public forceRerender: () => void;
     public endGame: string | null = null;
+    public specialCardTimeoutId: ReturnType<typeof setTimeout> | null;
+    public specialCardIntervalId: ReturnType<typeof setInterval> | null;
     private snapTimeoutId: ReturnType<typeof setTimeout> | null;
     private snapIntervalId: ReturnType<typeof setInterval> | null;
 
@@ -45,6 +50,8 @@ class Game {
         setDiscarded: (discarded: FaceUpCard[]) => void,
         snapTimer: number,
         setSnapTimer: (timer: number) => void,
+        specialCardTimer: number | "executing",
+        setSpecialCardTimer: (timer: number | "executing") => void,
         forceRerender: () => void
     ) {
         // attributes
@@ -66,10 +73,18 @@ class Game {
             this.snapTimer = timer;
             setSnapTimer(timer);
         };
+        this.specialCardTimer = specialCardTimer;
+        this.setSpecialCardTimer = (timer: number | "executing") => {
+            this.specialCardTimer = timer;
+            setSpecialCardTimer(timer);
+        };
+        this.specialCardTimeoutId = null;
+        this.specialCardIntervalId = null;
         this.forceRerender = forceRerender;
         this.snapTimeoutId = null;
         this.snapIntervalId = null;
         this.userCards = [];
+        this.opponentCards = [];
         this.endGame = null;
     }
     
@@ -139,7 +154,7 @@ class Game {
         return this.action.config;
     }
 
-    triggerNextAction() { // increment to the next action
+    triggerNextAction(): any { // increment to the next action
         this.forceRerender();
         if (this.action.type === "start") {
             this.setAction({
@@ -167,6 +182,20 @@ class Game {
 
 
         } else if (this.action.type === "discard") { // discard a card --> switch turns (in future: special card action, snap, then switch turns)
+            const latestDiscard = this.discarded[this.discarded.length - 1];
+            if (["J", "Q", "K"].includes(latestDiscard.rank) && !(latestDiscard.rank === "K" && (latestDiscard.suit === "D" || latestDiscard.suit === "H")) && this.action.agent === "player") { 
+                this.setAction({
+                    agent: "player",
+                    type: latestDiscard.rank === "J" ? "jack" : latestDiscard.rank === "Q" ? "queen" : "black_king",
+                    config: {
+                        amount: 0,
+                        next: "player",
+                    },
+                });
+                this.nw.post(`You played a ${latestDiscard.rank}. ${latestDiscard.rank === "J" ? "View one of your cards for 5 seconds." : latestDiscard.rank === "Q" ? "View one of your opponent's cards for 5 seconds." : "Swap two cards blindly."}`, "info");
+                return this.triggerNextAction();
+            }
+
             this.setAction({
                 agent: "both",
                 type: "snap",
@@ -233,17 +262,76 @@ class Game {
 
         
 
-        // ----#### THESE FEATURES HAVE NOT BEEN MADE YET ####----
+        // ----#### THESE FEATURES HAVE NOT BEEN MADE YET ####---- \\
         } else if (this.action.type === "jack" || this.action.type === "queen" || this.action.type === "black_king") { // special cards
-            this.setAction({
-                agent: this.action.agent === "player" ? "opponent" : "player",
-                type: "pickup",
-                config: {
-                    amount: 1,
-                    next: this.action.agent === "player" ? "opponent" : "player",
-                },
-            });
+            this.setSpecialCardTimer(10);
+            this.specialCardTimeoutId = setTimeout(() => {
+                this.setSpecialCardTimer(0);
+            }, 10000);
+            this.specialCardIntervalId = setInterval(() => {
+                if (this.specialCardTimer === "executing") return;
+                if (this.specialCardTimer > 0) {
+                    this.setSpecialCardTimer(this.specialCardTimer - 0.1);
+                }
 
+                if (this.specialCardTimer === 0) {
+                    this.setSpecialCardTimer(0);
+                    if (this.specialCardTimeoutId) {
+                        clearTimeout(this.specialCardTimeoutId);
+                        this.specialCardTimeoutId = null;
+                    }
+
+                    this.setAction({
+                        agent: "both",
+                        type: "snap",
+                        config: {
+                            amount: -1,
+                            next: this.action.agent === "player" ? "opponent" : "player",
+                        },
+                    });
+
+                    this.nw.post("A card has been discarded. If you have a card of the same rank, you can snap it to also discard it. You only have 5 seconds to snap!", "info");
+                    this.setSnapTimer(5);
+                    this.snapTimeoutId = setTimeout(() => {
+                        this.setSnapTimer(0);
+                    }, 5000);
+                    this.snapIntervalId = setInterval(() => {
+                        if (this.snapTimer > 0) {
+                            this.setSnapTimer(this.snapTimer - 0.1);
+                        }
+
+                        if (this.snapTimer === 0) {
+                            this.setSnapTimer(0);
+                            if (this.snapTimeoutId) {
+                                clearTimeout(this.snapTimeoutId);
+                                this.snapTimeoutId = null;
+                            }
+                            if (this.snapIntervalId) {
+                                clearInterval(this.snapIntervalId);
+                                this.snapIntervalId = null;
+                            }
+
+                            this.nw.post(`You can no longer snap.`, "info");
+                            
+                            for (const card of this.userCards) {
+                                card.snapSelected = false;
+                            }
+
+                            const cardEls = document.querySelectorAll(".border-green-500");
+                            cardEls.forEach(el => {
+                                el.classList.remove("border-green-500");
+                                el.classList.add("border-transparent");
+                            });
+                            this.triggerNextAction();
+                        }
+                    }, 100);
+
+                    if (this.specialCardIntervalId) {
+                        clearInterval(this.specialCardIntervalId);
+                        this.specialCardIntervalId = null;
+                    }
+                }
+            }, 100);
 
         } else if (this.action.type === "jack-snapped" || this.action.type === "queen-snapped" || this.action.type === "black_king-snapped") { // special cards but if they were snapped and not discarded
             this.setAction({

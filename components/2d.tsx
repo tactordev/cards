@@ -5,7 +5,8 @@ import { Card, FaceUpCard } from "./card";
 import {
   CircleUser,
   Zap,
-  Timer
+  Timer,
+  Info
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -45,6 +46,9 @@ export default function TwoD() { // 2d game component, 2d version of game
     const cw = game.cw;
     const discarded = game.discarded;
     const lastDiscard = discarded.length > 0 ? discarded[discarded.length - 1] : undefined;
+
+    game.userCards = game.userCards.filter(card => game.deck.user.includes(`${card.rank}${card.suit}`));
+    game.opponentCards = game.opponentCards.filter(card => game.deck.opponent.includes(`${card.rank}${card.suit}`));
 
 
     // special buttons
@@ -120,9 +124,14 @@ export default function TwoD() { // 2d game component, 2d version of game
             </div>
             <motion.div className="flex flex-row relative gap-2">
               { 
-                game!.deck.opponent.map((card, index) => (
-                  <div className="rotate-180" key={index}>{new Card(card[0], card[1], game, nw, cw).render("opponent-card", index)}</div>
-                ))
+                game.deck.opponent.map((card, index) => {
+                  let cardObj = game.opponentCards.find(c => c.rank === card[0] && c.suit === card[1]);
+                  if (!cardObj) {
+                    cardObj = new Card(card[0], card[1], game, nw, cw);
+                    game.opponentCards.push(cardObj);
+                  }
+                  return cardObj.render("opponent-card rotate-180", index);
+                })
               }
             </motion.div>
           </div>
@@ -161,10 +170,14 @@ export default function TwoD() { // 2d game component, 2d version of game
 
 
             {/* information */}
-            <div className="absolute flex flex-col top-0 -right-62 gap-4">
+            <div className="absolute flex flex-col top-0 -right-68 gap-4">
               <div className="relative group flex flex-row justify-center items-center section px-3 py-2 shadow-sm rounded-md gap-2 w-60">
                 <Timer />
                 <p className="translate-y-0.5 font-semibold text-gray-800 tabular-nums">Snap time: <span className="px-3 py-1 bg-slate-400/20 rounded-md mr-2 font-mono text-sm tabular-nums">{game.snapTimer === 0 ? "expired" : game.snapTimer.toFixed(1)}</span>.</p>
+              </div>
+              <div className="relative group flex flex-row justify-center items-center section px-3 py-2 shadow-sm rounded-md gap-2 w-64">
+                <Zap />
+                <p className="translate-y-0.5 font-semibold text-gray-800">Special card: <span className="px-3 py-1 bg-slate-400/20 rounded-md mr-2 font-mono text-sm">{game.specialCardTimer === 0 ? "expired" : game.specialCardTimer === "executing" ? "executing" : game.specialCardTimer.toFixed(1)}</span>.</p>
               </div>
             </div>
           </div>
@@ -186,9 +199,14 @@ export default function TwoD() { // 2d game component, 2d version of game
                 transition={{ duration: 0.5, ease: "easeInOut", delay: 0.35 }}
               >
 
-                { game.deck.user.map((card, index) => (
-                  new Card(card[0], card[1], game, nw, cw).render("player-card", index)
-                ))}
+                { game.deck.user.map((card, index) => {
+                  let cardObj = game.userCards.find(c => c.rank === card[0] && c.suit === card[1]);
+                  if (!cardObj) {
+                    cardObj = new Card(card[0], card[1], game, nw, cw);
+                    game.userCards.push(cardObj);
+                  }
+                  return cardObj.render("player-card", index);
+                })}
               </motion.div>
             </div>
 
