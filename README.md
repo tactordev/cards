@@ -4,9 +4,9 @@ This is a repository holding a multitude of different card games which I hope to
 #### File Structure
 All the config files are out in the open, no folder.
 
-`public`: this is where all the assets for the game go.
-`components`: this is where the main code is. These are reusable components for my game.
-`app`: this is where the main pages live. They can then reference reusable components from `components`.
+`public`: this is where all the assets for the game go.\
+`components`: this is where the main code is. These are reusable components for my game.\
+`app`: this is where the main pages live. They can then reference reusable components from `components`.\
 
 
 #### Demo
