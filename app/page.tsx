@@ -6,7 +6,7 @@ import { NotificationWindow } from "@/components/nw";
 import { CardWindow } from "@/components/cw";
 import { Card, FaceUpCard } from "@/components/card";
 import TwoD from "@/components/2d";
-import ThreeD from "@/components/3d";
+import GameCanvas from "@/components/3d";
 import {
   Info,
   Coffee,
@@ -113,7 +113,7 @@ export default function MainGame() {
   const content = (game.deck.deck.length > 0 && game.deck.user.length > 0 && game.deck.opponent.length > 0 && game.deck.user.length <= 6 && game.endGame !== "ended") // changes content depending on game state
     ? gameType === 2
       ? <TwoD />
-      : <ThreeD /> // 2d / 3d switch
+      : < GameCanvas /> // 2d / 3d switch
     : (
       <div className="flex flex-col gap-8 w-full h-screen items-center justify-center">
         <h1 className="text-2xl text-center">
