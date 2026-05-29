@@ -384,7 +384,7 @@ class FaceUpCard extends Card { // card but instead of seeing my marvelous card 
                 onClick={(event) => this.handler(event)}
                 key={`${this.rank}${this.suit}`}
             >
-                <img src={`/models/cards/${this.rank}_of_${suits[this.suit].toLowerCase()}.png`} alt="card mockup" className="h-36 w-24 shadow-sm opacity-80 mb-2" />
+                <img src={`/models/cards/${this.rank}_of_${suits[this.suit].toLowerCase()}.png`} alt="card mockup" className="h-36 w-24 shadow-sm opacity-80" />
             </motion.div>
         )
     }

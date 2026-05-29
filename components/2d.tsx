@@ -159,6 +159,7 @@ export default function TwoD() { // 2d game component, 2d version of game
                         animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
                         exit={{ opacity: 0, scale: 0.5 }}
                         transition={{ duration: 0.35, ease: "easeInOut" }}
+                        className="flex flex-row relative w-full h-full items-center justify-center"
                       >
                         {[discarded[discarded.length - 1].render("discarded-card", -2)]}
                       </motion.div>
