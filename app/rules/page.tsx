@@ -31,7 +31,7 @@ export default function Rules() {
 
                             <h3 className="text-gray-700 font-semibold text-md mt-6">The Game Cycle</h3>
                             <ol className="text-gray-500 text-sm list-decimal ml-6 flex flex-col gap-2">
-                                <li>At the start of each turn, a player will pick up a card from the deck.</li>
+                                <li>At the start of each turn, a player will pick up a card from the deck. They can also choose to pick up a card from the discard pile. If the latest card in the discard pile is a black king, they cannot pick it up.</li>
                                 <li>They can then choose a card to discard. This can be one from their current hand or the one they just picked up.</li>
                                 <li>Once a card is discarded, there will then be a 5 second timer where anyone else on the table can snap one of their cards.</li>
                                 <li>If they snap successfuly, they have one less card in their hand. This brings them closer to one of the win conditions: run out of cards.</li>
