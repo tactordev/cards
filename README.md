@@ -1,5 +1,5 @@
 ### Tactor Cards
-This is a repository holding a multitude of different card games which I hope to collate into all one game. My main inspiration for this project has come from school where we play these games almost daily. And my main motivation for completing this idea/project is from Macondo (a competition by HackClub). 
+This is a repository holding a multitude of different card games which I hope to collate into all one game.
 
 #### File Structure
 All the config files are out in the open, no folder.
